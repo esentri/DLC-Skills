@@ -1,0 +1,14 @@
+## DomainLifeCycles
+
+<!-- Keep this short: project decisions only, library knowledge lives in the skills. -->
+For any work on domain code, load the skills `ddd-tactical-java` and
+`domainlifecycles` first (Mode A: only `ddd-tactical-java`).
+Mode: C            <!-- A = plain DDD, B = DLC marker types only, C = DLC runtime -->
+Domain base package: com.example.shop
+Persistence: jOOQ  <!-- jOOQ | JDBC | none -->
+Validation style: DomainAssertions  <!-- BeanValidation+DomainAssertions (validation extender) | BeanValidation+DomainAssertions (BeanValidations.validate, no extender) | DomainAssertions | Java exceptions (no DLC) -->
+Event publishing: DomainEvents  <!-- DomainEvents | Spring ApplicationEventPublisher -->
+Package layout: default  <!-- default (ddd-tactical-java) | describe deviation -->
+Legacy contexts: none     <!-- contexts where the skill rules are not binding, e.g. com.example.shop.legacy -->
+Code language: German domain terms, no umlauts/ss in identifiers (ae, oe, ue, ss)
+Deviations from the skills: none

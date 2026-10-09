@@ -1,0 +1,34 @@
+{
+  "name": "dlc-plugins",
+  "owner": {
+    "name": "esentri"
+  },
+  "metadata": {
+    "description": "Tactical DDD skills for Java, with and without DomainLifeCycles (DLC)"
+  },
+  "plugins": [
+    {
+      "name": "ddd-tactical-java",
+      "source": "./",
+      "strict": false,
+      "description": "Tactical DDD modelling and implementation rules for Java, framework-agnostic",
+      "skills": [
+        "./skills/ddd-tactical-java"
+      ]
+    },
+    {
+      "name": "domainlifecycles",
+      "source": "./",
+      "strict": false,
+      "description": "DomainLifeCycles (DLC): marker types, runtime modules, persistence schema, diagrams, impact analysis, project setup, new-aggregate workflow",
+      "skills": [
+        "./skills/domainlifecycles",
+        "./skills/dlc-diagrammer",
+        "./skills/dlc-project-setup",
+        "./skills/dlc-impact-analysis",
+        "./skills/dlc-persistence-schema",
+        "./skills/new-aggregate"
+      ]
+    }
+  ]
+}

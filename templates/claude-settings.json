@@ -1,0 +1,11 @@
+{
+  "extraKnownMarketplaces": {
+    "dlc-plugins": {
+      "source": { "source": "github", "repo": "esentri/DLC-Skills" }
+    }
+  },
+  "enabledPlugins": {
+    "ddd-tactical-java@dlc-plugins": true,
+    "domainlifecycles@dlc-plugins": true
+  }
+}
