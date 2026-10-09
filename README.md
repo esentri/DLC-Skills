@@ -17,7 +17,7 @@ Targets **DLC 3.5.x**.
 | `dlc-diagrammer` | Domain diagrams, flow diagrams, mirror export, Diagram Viewer upload | "diagram", "visualise", "draw the flow of X" |
 | `dlc-persistence-schema` | Tables, sequences, FKs and migrations for DLC aggregates; jOOQ codegen; mapping errors | "migration", "table for aggregate", codegen / mapping errors |
 | `dlc-impact-analysis` | Call graph and flows as text via DLC static analysis | "who calls X", "what happens after command Y", impact of a change |
-| `dlc-project-setup` | Adding DLC to a project, mode decision, persistence backend, bootstrap | new project / migration / upgrade |
+| `dlc-project-setup` | Mode decision (A/B/C), adding DLC, A -> B migration, persistence backend, bootstrap | new project / migration / upgrade |
 | `new-aggregate` | Explicit workflow: model -> implement -> test | only manual (`/new-aggregate`) |
 
 Modes inside `domainlifecycles` are cumulative: **A** plain DDD ⊂ **B** DLC marker

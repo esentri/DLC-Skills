@@ -89,13 +89,13 @@ For a guided checklist see `references/modeling-checklist.md`.
 - No "empty" objects: constructors enforce the initial validity.
 - Pure: no infrastructure dependencies and no repository calls inside an aggregate.
 - Inner entities are never handed out for modification; expose read-only views
-  (`Stream`, unmodifiable collections, value object copies).
+  (unmodifiable collections).
 - **Reference other aggregates by ID only**, never by object reference.
 - A use case changing **one** aggregate needs no domain service: the application
   service loads it, calls the domain method and stores it.
 - Several aggregates may change in the **same transaction** only when a domain
   service coordinates them. Otherwise cross-aggregate consistency is eventual,
-  via domain events.
+  via domain events. Using domain events and eventual consistency is preferred.
 - The root enforces all invariants of the aggregate after every operation.
 - Optimistic locking (a version field) on the root protects the boundary.
 

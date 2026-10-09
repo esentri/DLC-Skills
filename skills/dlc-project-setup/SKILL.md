@@ -61,12 +61,15 @@ External libraries - starter features stay **silently off** without them:
 - Schema, migrations and codegen settings (incl. `recordVersionFields`): load the
   skill `dlc-persistence-schema`. Repositories: `domainlifecycles`,
   `references/persistence.md`.
-- Transaction cache (optional) needs Spring Boot 3.4+ / Spring 6.2+.
+- Transaction cache (optional) needs Spring Boot 3.4+ / Spring 6.2+. Ask for enablement if setup permits.
 
 ## Step 4 - bootstrap
-- Spring: `@EnableDlc(dlcMirrorBasePackages = "com.example.shop")`.
-- Plain Java: `Domain.initialize(new ReflectiveDomainMirrorFactory("com.example.shop"))`
-  once at startup and in test setup.
+- Spring Boot with the starter: only `@EnableDlc(dlcMirrorBasePackages = "com.example.shop")`.
+  The autoconfig initialises the mirror - **no `Domain.initialize(...)`**, neither in
+  the application nor in `@SpringBootTest`s.
+- Without Spring autoconfig (plain Java, or plain unit tests without a Spring
+  context): `Domain.initialize(new ReflectiveDomainMirrorFactory("com.example.shop"))`
+  once at startup / in the test setup.
 - Validation is **not** autoconfigured: with the validation extender call
   `ValidationDomainClassExtender.extend(...)` early (e.g. `@PostConstruct`), see
   `domainlifecycles`, `references/validation.md`.

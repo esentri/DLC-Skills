@@ -23,6 +23,8 @@ and reference files were loaded. Expected values are the target cut.
 | 16 | The app fails at startup with a DLC mapping error for OrderItem | C | dlc-persistence-schema, domainlifecycles | persistence |
 | 17 | Who calls Order.cancel() and what breaks if I change its signature? | B | dlc-impact-analysis, domainlifecycles | bootstrap-mirror |
 | 18 | What happens after the PlaceOrder command is processed? | C | dlc-impact-analysis | - |
+| 19 | Set up this new project for DDD, we don't want any DDD library | none | dlc-project-setup, ddd-tactical-java | - |
+| 20 | Make our existing plain-DDD domain model explicit with DLC marker types | A | dlc-project-setup, domainlifecycles | marker-types |
 
 Rule of thumb: two skills competing for the same prompt -> merge them;
 a skill used only partially in most prompts -> split it further.

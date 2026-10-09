@@ -12,7 +12,7 @@ initialised **once, before** any of them is used.
 Domain.initialize(new ReflectiveDomainMirrorFactory("com.example.shop"));
 ```
 - Pass the base package(s) of the domain model.
-- In tests, initialise in a `@BeforeAll` / static block.
+- In tests **without** a Spring context, initialise in a `@BeforeAll` / static block.
 
 ## Spring Boot
 
@@ -25,7 +25,8 @@ autoconfig. Configure the packages:
 public class Application { ... }
 ```
 or `dlc.features.mirror.base-packages=com.example.shop`.
-Do **not** call `Domain.initialize` manually in addition.
+Do **not** call `Domain.initialize` manually in addition - also not in
+`@SpringBootTest`s; use `Domain.getDomainMirror()` there.
 
 ## Bounded contexts in the Mirror
 Resolution order:

@@ -121,8 +121,7 @@ Never hand-roll call-graph analysis - use flows here or `dlc-impact-analysis`.
 - Goal / task `serializeMirror`: writes the Domain Mirror as JSON at build time.
 - Goal `domainModelUpload`: uploads the model (optionally with the static analysis
   result) to a Diagram Viewer instance, authenticated with an `apiKey` from the
-  viewer's profile. Upstream states the Diagram Viewer is **not yet released** -
-  check availability first. Never commit the API key into the build file.
+  viewer's profile. Never commit the API key into the build file.
 
 ## Troubleshooting
 - Class missing -> outside `domainModelPackages`, or no DLC marker type.
