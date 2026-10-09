@@ -9,8 +9,9 @@ Tables, columns, sequences, migrations and jOOQ codegen: load the skill
 
 ## Choosing the backend
 - Default: **jOOQ** (`JooqAggregateRepository`) - type-safe, needs jOOQ code
-  generation at build time. DLC stays on **jOOQ 3.19.x** (Spring Boot 4.1 manages
-  3.21, which needs Java 21) - pin the version.
+  generation at build time. DLC supports jOOQ 3.19.x and 3.21.x - on Java 21 the
+  jOOQ version managed by Spring Boot 4.1 (3.21) is fine; Java 17 projects need
+  jOOQ 3.19.x (jOOQ 3.21 requires Java 21).
 - **JDBC** (`JdbcAggregateRepository`) if the team cannot or will not run jOOQ
   codegen (no build-time DB, licensing). Reads the schema at runtime.
 - The Spring starters contain both; jOOQ wins when usable (see

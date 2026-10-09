@@ -1,7 +1,8 @@
 {
   "extraKnownMarketplaces": {
     "dlc-plugins": {
-      "source": { "source": "github", "repo": "esentri/DLC-Skills" }
+      "source": { "source": "github", "repo": "esentri/DLC-Skills" },
+      "autoUpdate": true
     }
   },
   "enabledPlugins": {

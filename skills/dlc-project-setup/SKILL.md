@@ -1,6 +1,6 @@
 ---
 name: dlc-project-setup
-description: Set up or migrate a Java project to use DomainLifeCycles (DLC) - choosing the mode (marker types only vs. full runtime), adding dependencies or the Spring Boot starter, jOOQ code generation vs. plain JDBC persistence, Flyway schema, mirror bootstrap and the AGENTS.md mode declaration. Use for new DLC projects, adding DLC to an existing build (Maven or Gradle), or upgrading DLC versions.
+description: Set up or migrate a Java project for tactical DDD with or without DomainLifeCycles (DLC) - choosing the mode (plain DDD without DLC, marker types only, or full runtime), moving a plain-DDD project to DLC marker types, adding dependencies or the Spring Boot starter, jOOQ code generation vs. plain JDBC persistence, Flyway schema, mirror bootstrap and the AGENTS.md mode declaration. Use for new DLC projects, adding DLC to an existing build (Maven or Gradle), or upgrading DLC versions.
 ---
 
 # DLC project setup
@@ -12,6 +12,7 @@ Targets DLC 3.5.x. Upstream: `getting-started/english/index_en.md`, `llms.txt`,
 
 | Mode | What you get | Dependencies |
 |------|--------------|--------------|
+| A: plain DDD | Tactical DDD rules only (`ddd-tactical-java`), no library | none |
 | B: markers | Explicit DDD concepts, diagrams, no runtime magic | `types`, `type-utils`, optional `assertions`, `builder` |
 | C: runtime | + persistence, JSON, events, validation, Spring | `spring-boot-starter` (Boot 4.x) or `spring-boot3-starter` (Boot 3.x), or single modules |
 
@@ -26,6 +27,21 @@ Validation style: BeanValidation+DomainAssertions (validation extender)
 Always ask for the validation style too: validation extender -> Bean
 Validation + DomainAssertions (automatic); Bean Validation without extender ->
 `BeanValidations.validate(this)` in `validate()`; otherwise DomainAssertions only.
+
+### Mode A - short path
+1. Record it in `AGENTS.md`, so later sessions know the absence of DLC is
+   deliberate:
+   ```markdown
+   ## DomainLifeCycles
+   For any work on domain code, load the skill `ddd-tactical-java` first.
+   Mode: A
+   Domain base package: com.example.shop
+   Validation style: Java exceptions (no DLC)
+   Package layout: default
+   ```
+2. Create one root package per bounded context with the default package layout
+   from `ddd-tactical-java` (no `@BoundedContext` annotation in Mode A).
+3. Skip steps 2-6; verify with a unit test per invariant.
 
 ## Step 2 - dependencies (group `io.domainlifecycles`, version `3.5.0`)
 
@@ -44,8 +60,9 @@ Use a version property / version catalog; never mix DLC versions.
 
 External libraries - starter features stay **silently off** without them:
 - always: SLF4J provider
-- jOOQ backend: jOOQ, **pinned to 3.19.x** (Spring Boot 4.1 manages 3.21, which
-  needs Java 21 and is not supported by DLC 3.5)
+- jOOQ backend: jOOQ 3.19.x or 3.21.x (3.21 requires Java 21 - on Java 17 pin
+  3.19.x, e.g. via `<jooq.version>`; on Java 21 the Spring Boot 4.1 managed version
+  works)
 - JDBC driver for the database
 - Spring Web (web integration), SpringDoc (OpenAPI), spring-tx (transactional events)
 - Bean Validation: a provider such as Hibernate Validator (without it constraints
@@ -90,6 +107,25 @@ The plugin is independent of the starters.
 - Build compiles, a smoke test loads the mirror (`Domain` initialised, a known
   aggregate is resolvable).
 - Mode C: an insert + `findById` round-trip test for one aggregate.
+
+## Moving from Mode A to Mode B
+Makes the existing model explicit and diagrammable; runtime behaviour does not change.
+1. Add `io.domainlifecycles:types` and `io.domainlifecycles:type-utils` (optionally
+   `assertions`, `builder`) - see step 2.
+2. Mark the building blocks (see `domainlifecycles`, `references/marker-types.md`):
+   - aggregate roots / entities: extend `AggregateRootBase<ID>` / `EntityBase<ID>`
+     (adds `concurrencyVersion` to the constructor); remove hand-written
+     `equals`/`hashCode`,
+   - typed IDs: `implements Identity<V>`; value objects: `implements ValueObject`
+     (not enums),
+   - services, repositories, factories, commands, events, read models, query
+     handlers, outbound ports: their marker interfaces; `@Publishes` /
+     `@DomainEventListener` / `@FactoryMethod` where applicable.
+3. Add `package-info.java` with `@BoundedContext` to each context root package.
+4. Decide whether invariants stay as Java exceptions or move to `DomainAssertions`
+   (one style per project) and update `AGENTS.md` (`Mode: B`, validation style).
+5. Optionally add the build plugin and generate a first diagram (`dlc-diagrammer`)
+   to check that every class is recognised.
 
 ## Upgrading DLC
 Read `CHANGELOG.md` upstream for every version between old and new; bump all DLC

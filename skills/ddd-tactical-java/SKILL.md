@@ -46,7 +46,7 @@ For a guided checklist see `references/modeling-checklist.md`.
 - Without a DDD library: guard clauses throwing standard Java exceptions
   (`IllegalArgumentException` for invalid input, `IllegalStateException` for
   forbidden state transitions, `NullPointerException` via `Objects.requireNonNull`).
-- A library skill (e.g. `domainlifecycles`) may define its own mechanism; the
+- A library-specific skill may define its own mechanism; the
   project's `AGENTS.md` decides the preferred style and wins over both.
 
 ## Building block rules
