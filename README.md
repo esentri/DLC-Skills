@@ -16,7 +16,8 @@ Targets **DLC 3.5.x**.
 | `domainlifecycles` | `domainlifecycles` | DLC marker types and runtime modules; detects mode A/B/C and loads only the references for the modules in use | DLC types / `io.domainlifecycles` in the build, "DLC" |
 | `dlc-persistence-schema` | `domainlifecycles` | Tables, sequences, FKs and migrations for DLC aggregates; jOOQ codegen; mapping errors | "migration", "table for aggregate", codegen / mapping errors |
 | `dlc-impact-analysis` | `domainlifecycles` | Call graph and flows as text via DLC static analysis | "who calls X", "what happens after command Y", impact of a change |
-| `dlc-diagrammer` | `domainlifecycles` | Domain and flow diagrams, mirror export (Diagram Viewer upload once released) | "diagram", "visualise", "draw the flow of X" |
+| `dlc-diagrammer` | `domainlifecycles` | Domain and flow diagrams via build plugin / API, mirror export | "diagram", "visualise", "draw the flow of X" |
+| `dlc-diagram-viewer` | `domainlifecycles` | Run the DLC Diagram Viewer with Docker Compose, upload the model incl. static analysis | "start the Diagram Viewer", "upload the model to the viewer" |
 | `dlc-project-setup` | `domainlifecycles` | Mode decision (A/B/C), adding DLC, A -> B migration, persistence backend, bootstrap, upgrades | new project / migration / upgrade |
 | `new-aggregate` | `domainlifecycles` | Explicit workflow: model -> implement -> test | manual (`/new-aggregate`); Claude Code never triggers it automatically (`disable-model-invocation`), other agents may |
 
@@ -33,6 +34,7 @@ skills/
   dlc-persistence-schema/           SKILL.md + references/ddl-example.md
   dlc-impact-analysis/
   dlc-diagrammer/
+  dlc-diagram-viewer/               SKILL.md + references/docker-compose.yaml
   dlc-project-setup/
   new-aggregate/
 templates/
@@ -58,7 +60,7 @@ The marketplace is `dlc-plugins` (`.claude-plugin/marketplace.json`) with two pl
 | Plugin | Skills |
 |---|---|
 | `ddd-tactical-java` | `ddd-tactical-java` |
-| `domainlifecycles` | `domainlifecycles`, `dlc-persistence-schema`, `dlc-impact-analysis`, `dlc-diagrammer`, `dlc-project-setup`, `new-aggregate` (enable together with `ddd-tactical-java`) |
+| `domainlifecycles` | `domainlifecycles`, `dlc-persistence-schema`, `dlc-impact-analysis`, `dlc-diagrammer`, `dlc-diagram-viewer`, `dlc-project-setup`, `new-aggregate` (enable together with `ddd-tactical-java`) |
 
 **Per project (preferred):** commit one of the templates as `.claude/settings.json`
 (or merge it into an existing one). Team members are offered the marketplace once
@@ -178,6 +180,7 @@ evals/results/<timestamp>/report.html, aggregate-result.json
   `evals/cases/` is generated (and git-ignored). `run.sh` regenerates on every run.
 - **Sample projects:** each case scaffolds a small Java project in its mode -
   `none` (empty project, no `AGENTS.md`), `A` (plain DDD), `B` (DLC marker types),
+  `C-JDBC` (like C with plain-JDBC persistence),
   `C` (Spring Boot 4 + DLC `spring-boot-starter` + jOOQ, Java 21) - with `pom.xml`, `AGENTS.md` and a few domain
   classes, so the skills' mode detection has real evidence.
 - **Graders:**
@@ -201,9 +204,9 @@ evals/results/<timestamp>/report.html, aggregate-result.json
 
 Running:
 ```bash
-evals/run.sh --runs 1                         # all 52 cases once (~15 USD)
-evals/run.sh                                  # 3 runs per case (default, ~45 USD)
-evals/run.sh --case 't1*' --runs 1            # subset by case name (one --case only)
+evals/run.sh --runs 1                         # all 85 cases once (~25-30 USD)
+evals/run.sh                                  # 3 runs per case (default, ~75-85 USD)
+evals/run.sh --case 't1*' --runs 1            # subset by name: one --case, simple * globs only (no [0-9])
 evals/run.sh --tag rules                      # triggering | negative | agents-md | rules | mode-a/-b/-c/-none
 evals/run.sh --threshold 0.8 --max-cost-usd 20 --json results.json   # CI
 ```
@@ -218,6 +221,10 @@ Adding a case: append an entry to `evals/suite.json` (`id`, `mode`, `prompt`,
 `legacy`, `answer_must`, `answer_must_not`, `judge`, `note`; see the docstring of
 `evals/generate.py`), then run it alone, e.g. `evals/run.sh --case 'r55*' --runs 1`.
 Add `--keep-temp` to inspect a run's trace.
+Anchor `answer_must_not` patterns to code (`^\s*@Service` with `flags: m`,
+`import ...`, `throw new ...`, `CREATE TABLE ...`): agents often explain what they
+deliberately did *not* do ("no `@Component` needed"), and a plain word match then
+fails a correct answer.
 
 Reading results: a skill missing in many cases -> sharpen its `description`; two
 skills competing for the same prompts -> merge them or separate their trigger words;

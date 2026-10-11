@@ -24,6 +24,8 @@ Targets **DomainLifeCycles 3.5.x**.
   aggregates, jOOQ codegen, mapping troubleshooting, DDL example.
 - `dlc-impact-analysis`: call graph and flows as text via DLC static analysis.
 - `dlc-diagrammer`: domain and flow diagrams via build plugin or Java API.
+- `dlc-diagram-viewer`: run the DLC Diagram Viewer with Docker Compose and upload
+  the domain model incl. static analysis via the build plugin.
 - `dlc-project-setup`: mode decision incl. plain DDD, dependencies, bootstrap,
   bounded contexts, A -> B migration, upgrade pitfalls.
 - `new-aggregate`: explicit workflow from model to tested implementation.

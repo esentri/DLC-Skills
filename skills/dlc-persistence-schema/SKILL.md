@@ -8,6 +8,11 @@ description: Design, write or review the relational schema behind DomainLifeCycl
 Targets **DLC 3.5.x**. Upstream: `persistence/readme.md` ("Object relational mapping"),
 `jooq-integration/readme.md`, `jdbc-integration/readme.md`.
 
+> **STOP - before reading on: invoke the skill `domainlifecycles` now if it is not
+> loaded yet, and read its `references/persistence.md`** - also for "just a
+> migration". This skill covers only the schema side; backend choice,
+> repositories, fetcher and the mode check live there.
+
 ## Prerequisite - do this first
 
 Load `domainlifecycles` and its `references/persistence.md` (backend choice,

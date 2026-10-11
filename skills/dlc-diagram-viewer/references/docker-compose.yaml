@@ -1,0 +1,61 @@
+# DLC Diagram Viewer - local run (Kroki, PostgreSQL, viewer).
+# Based on docker/run/docker-compose.yaml of esentri/diagram-viewer.
+# Differences: PostgreSQL is not exposed on the host (avoids clashes with a local
+# database on 5432); optional named volume for persistent projects/users.
+#
+#   docker compose -f .dlc/diagram-viewer/docker-compose.yaml up -d
+#   curl -fs http://localhost:8090/actuator/health
+#   UI: http://localhost:8090
+services:
+  kroki:
+    image: yuzutech/kroki:latest
+    environment:
+      # nomnoml conversions of large diagrams take longer than Kroki's default of 5s
+      KROKI_COMMAND_TIMEOUT: ${KROKI_COMMAND_TIMEOUT:-60s}
+    ports:
+      - "8000:8000"
+    networks:
+      - diagram-viewer-network
+
+  database:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: diagram-viewer-db
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d diagram-viewer-db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    # uncomment to keep projects and users across `docker compose down`
+    # volumes:
+    #   - diagram-viewer-data:/var/lib/postgresql/data
+    networks:
+      - diagram-viewer-network
+
+  diagram-viewer-app:
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
+    image: marioherb/dlc-diagram-viewer:latest
+    ports:
+      - "8090:8090"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/diagram-viewer-db
+      SPRING_DATASOURCE_USERNAME: user
+      SPRING_DATASOURCE_PASSWORD: password
+      KROKI_CONTAINER_URL: http://kroki:8000
+      JAVA_TOOL_OPTIONS: ${DIAGRAM_VIEWER_JAVA_OPTS:--Xmx2g -XX:+UseG1GC -XX:+UseStringDeduplication}
+    depends_on:
+      database:
+        condition: service_healthy
+    networks:
+      - diagram-viewer-network
+
+networks:
+  diagram-viewer-network:
+    driver: bridge
+
+# volumes:
+#   diagram-viewer-data:

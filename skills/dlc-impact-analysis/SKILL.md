@@ -8,6 +8,9 @@ description: Answer call-graph and impact questions in DomainLifeCycles (DLC) pr
 Targets DLC 3.5.x. Upstream: `static-analysis/readme.md`,
 `static-analysis-serialization-jackson3/readme.md`, `dlc-plugins/readme.md`.
 
+> **STOP - before reading on: invoke the skill `domainlifecycles` now if it is not
+> loaded yet** (mode check, mirror bootstrap).
+
 ## Prerequisite
 Load `domainlifecycles` first (Mode B or C is enough). Picture wanted ->
 `dlc-diagrammer` (`includeFlowsFrom` / `includeFlowsTo`).

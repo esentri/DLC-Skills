@@ -6,12 +6,14 @@ Each case gets its own directory under evals/cases/ with
   setup.sh   - scaffold script creating a small Java project in the given mode
 
 Case fields (suite.json):
-  id, mode (none|A|B|C), prompt, expect, forbid ("*" = all skills), reads, note
+  id, mode (none|A|B|C|C-JDBC), prompt, expect, forbid ("*" = all skills), reads, note
   section   triggering | negative | agents-md | rules (default from expect)
   agents    overrides for AGENTS.md lines, e.g. {"Event publishing": "..."};
             {"loading_line": false} drops the skill-loading line,
             {"Mode": "A"} switches to the plain-DDD AGENTS.md
   legacy    true -> scaffold an additional legacy context (umschreibungen)
+  extra_deps   [[group, artifact, version|null], ...] added to the pom
+  extra_files  {path: content} added to the sample project
   answer_must / answer_must_not
             regexes over the final answer (string or {"pattern", "flags"})
   judge     list of PASS/FAIL rubrics for an LLM judge over the final answer
@@ -31,7 +33,7 @@ CASES = EVALS / "cases"
 
 ALL_SKILLS = [
     "ddd-tactical-java", "domainlifecycles", "dlc-persistence-schema",
-    "dlc-impact-analysis", "dlc-diagrammer", "dlc-project-setup", "new-aggregate",
+    "dlc-impact-analysis", "dlc-diagrammer", "dlc-diagram-viewer", "dlc-project-setup", "new-aggregate",
 ]
 # new-aggregate has disable-model-invocation: Claude Code must never load it on its own.
 ALWAYS_FORBIDDEN = ["new-aggregate"]
@@ -44,8 +46,12 @@ TIMEOUT_SECONDS_CODE = 360
 # Appended to every prompt: runs stay read-only, short and cheap. Triggering cases
 # only need the plan; rule cases need the code in the answer to grade it.
 PROMPT_SUFFIX = "\n\nDo not modify any files - explain how you would do it."
-PROMPT_SUFFIX_CODE = ("\n\nDo not modify any files - show the complete code (and SQL, "
-                      "if needed) of your solution in your answer, with package declarations.")
+# The LLM judge only sees an excerpt from the start of the answer - so the answer
+# starts with a short design summary the judge can grade.
+PROMPT_SUFFIX_CODE = ("\n\nDo not modify any files. Start your answer with a design summary of at most "
+                      "6 bullet points (which classes / building blocks, in which packages, who calls "
+                      "whom, which checks happen where). Then show the complete code (and SQL, if "
+                      "needed) of your solution, with package declarations.")
 
 
 def q(s: str) -> str:
@@ -81,7 +87,7 @@ def agents_md(mode: str, overrides: dict) -> str:
         line = LOADING_A
     else:
         fields = {"Mode": mode, "Domain base package": "com.example.shop",
-                  "Persistence": "jOOQ" if mode == "C" else "none",
+                  "Persistence": {"C": "jOOQ", "C-JDBC": "JDBC"}.get(mode, "none"),
                   "Validation style": "DomainAssertions", "Event publishing": "DomainEvents",
                   "Package layout": "default", "Legacy contexts": "none"}
         line = LOADING_BC
@@ -273,20 +279,22 @@ public interface UmschreibungDao {
 
 def files_for(c: dict) -> dict:
     mode = c["mode"]
-    files = base_files(mode)
+    extra = "".join(dep(g, a, v) for g, a, v in c.get("extra_deps", []))
+    files = base_files(mode, extra)
     if "AGENTS.md" in files or c.get("agents"):
         files["AGENTS.md"] = agents_md(mode, c.get("agents"))
     if c.get("legacy"):
         files.update(LEGACY)
+    files.update(c.get("extra_files", {}))
     return files
 
 
-def base_files(mode: str) -> dict:
+def base_files(mode: str, extra: str = "") -> dict:
     if mode == "none":
-        return {"pom.xml": POM.format(parent="", props="", deps="")}
+        return {"pom.xml": POM.format(parent="", props="", deps=extra)}
     if mode == "A":
         return {
-            "pom.xml": POM.format(parent="", props="", deps=""),
+            "pom.xml": POM.format(parent="", props="", deps=extra),
             "AGENTS.md": "",
             f"{DOMAIN}/Order.java": ORDER_A,
             f"{DOMAIN}/OrderStatus.java": STATUS,
@@ -294,7 +302,8 @@ def base_files(mode: str) -> dict:
     dlc = "3.5.0"
     if mode == "B":
         deps = (dep("io.domainlifecycles", "types", dlc) + dep("io.domainlifecycles", "type-utils", dlc)
-                + dep("io.domainlifecycles", "assertions", dlc) + dep("org.projectlombok", "lombok", "1.18.48"))
+                + dep("io.domainlifecycles", "assertions", dlc) + dep("org.projectlombok", "lombok", "1.18.48")
+                + extra)
         return {
             "pom.xml": POM.format(parent="", props="", deps=deps),
             "AGENTS.md": "",
@@ -302,16 +311,21 @@ def base_files(mode: str) -> dict:
             f"{DOMAIN}/Order.java": ORDER_DLC,
             f"{DOMAIN}/OrderStatus.java": STATUS,
         }
-    if mode == "C":
+    if mode in ("C", "C-JDBC"):
+        jdbc = mode == "C-JDBC"
         deps = (dep("io.domainlifecycles", "spring-boot-starter", dlc)
                 + dep("org.springframework.boot", "spring-boot-starter-webmvc")
-                + dep("org.springframework.boot", "spring-boot-starter-jooq")
+                + dep("org.springframework.boot", "spring-boot-starter-jdbc" if jdbc else "spring-boot-starter-jooq")
+                + (dep("org.postgresql", "postgresql") if jdbc else "")
                 + dep("org.springframework.boot", "spring-boot-starter-flyway")
-                + dep("org.projectlombok", "lombok"))
+                + dep("org.projectlombok", "lombok")
+                + extra)
+        app = APP_C.replace('jooqRecordPackage = "com.example.shop.jooq.tables.records"',
+                            'jooqSqlDialect = "POSTGRES"') if jdbc else APP_C
         return {
             "pom.xml": POM.format(parent=BOOT_PARENT, props=BOOT_PROPS, deps=deps),
             "AGENTS.md": "",
-            f"{SRC}/ShopApplication.java": APP_C,
+            f"{SRC}/ShopApplication.java": app,
             f"{SRC}/order/package-info.java": PACKAGE_INFO,
             f"{DOMAIN}/Order.java": ORDER_DLC,
             f"{DOMAIN}/OrderStatus.java": STATUS,

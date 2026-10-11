@@ -20,12 +20,13 @@
       "name": "domainlifecycles",
       "source": "./",
       "strict": false,
-      "description": "DomainLifeCycles (DLC): marker types, runtime modules, persistence schema, diagrams, impact analysis, project setup, new-aggregate workflow",
+      "description": "DomainLifeCycles (DLC): marker types, runtime modules, persistence schema, impact analysis, diagrams, Diagram Viewer, project setup, new-aggregate workflow",
       "skills": [
         "./skills/domainlifecycles",
         "./skills/dlc-persistence-schema",
         "./skills/dlc-impact-analysis",
         "./skills/dlc-diagrammer",
+        "./skills/dlc-diagram-viewer",
         "./skills/dlc-project-setup",
         "./skills/new-aggregate"
       ]

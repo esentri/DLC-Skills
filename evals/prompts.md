@@ -20,15 +20,15 @@ the descriptions; a skill used only partially in most prompts -> split it furthe
 evals/run.sh --runs 1                 # all cases once
 evals/run.sh                          # 3 runs per case (default)
 evals/run.sh --tag rules --runs 1     # one section: triggering | negative | agents-md | rules
-evals/run.sh --case 'r4*'             # subset by case name (only one --case is honoured)
+evals/run.sh --case 'r4*'             # subset by name: one --case, simple * globs only (no [0-9])
 ```
 
 | Section | Cases | Case names | Graders |
 |---|---|---|---|
-| 1. Triggering | #1-#31 | `t..` | expected skills loaded, forbidden not loaded, references read |
+| 1. Triggering | #1-#31, #80-#83 | `t..` | expected skills loaded, forbidden not loaded, references read |
 | 2. Negative tests | #32-#35 (+ `new-aggregate` forbidden everywhere = #36) | `n..` | forbidden skills not loaded |
 | 3. AGENTS.md activation | #38-#42 | `a..` | skills + regexes / LLM judge on the answer, with per-case `AGENTS.md` variants |
-| 4. Rule adherence | #43-#54 | `r..` | regexes on the answer (deterministic) + LLM judge (Haiku, 3 votes) for rules regexes can't express |
+| 4. Rule adherence | #43-#79, #84-#87 | `r..` | regexes on the answer (deterministic) + LLM judge (Haiku, 3 votes) for rules regexes can't express |
 
 - `evals/generate.py` turns the JSON into `evals/cases/<case>/case.yaml` + `setup.sh`
   (scaffolds the sample project; `agents` overrides lines of `AGENTS.md`, `legacy`
@@ -63,7 +63,7 @@ realistically in the sandbox - check it in a real project session.
 
 ## 4. Rule adherence (check the generated code)
 
-Automated as cases `r43`-`r54`.
+Automated as cases `r43`-`r79`. Mode `C-JDBC` = like C, but plain-JDBC persistence (no jOOQ).
 
 | # | Prompt | Mode | Check |
 |---|--------|------|-------|
@@ -79,3 +79,56 @@ Automated as cases `r43`-`r54`.
 | 52 | Write the migration for an Order with a list of action code value objects | C | table `ORDER_ACTION_CODES` with `ID`, `CONTAINER_ID`, sequence or UUID id; NOT NULL FK; `concurrency_version` on entity tables only |
 | 53 | Add the domain service OrderPricing in a Spring project | C | no `@Service` annotation (ServiceKind autoconfig registers it) |
 | 54 | Who calls OrderService.place (it is overloaded)? | B | resolves all overloads via `getMethods()`, not the by-name `flowTo` only |
+
+### Persistence and schema
+
+| # | Prompt | Mode | Check |
+|---|--------|------|-------|
+| 55 | Migration for Order with embedded value object deliveryAddress | C | columns `DELIVERY_ADDRESS_STREET` / `_CITY` (field path) |
+| 56 | OrderItem entity + migration | C | `ORDER_ID ... NOT NULL` in the child table, no parent-id field in the entity |
+| 57 | Migration for Customer with UUID identity | C | `UUID` / `CHAR(36)`, no `customer_id_seq` |
+| 58 | Migration for Invoice referencing Order by OrderId | C | no silent FK between aggregates - leave out with reason or ask (judge) |
+| 59 | Configure jOOQ code generation for DLC | C | `recordVersionFields` = `CONCURRENCY_VERSION` |
+| 60 | Repository method returning pending orders page by page | C | root records sorted + paged, `fetchDeep` - no hand-written joins (judge) |
+| 61 | Implement the Order repository | C-JDBC | `JdbcAggregateRepository` + `JdbcDomainPersistenceProvider`, no `DSLContext` |
+| 62 | Two users edit the same order | C | optimistic locking via `concurrencyVersion`, reload/report on conflict (judge) |
+| 63 | Bulk SQL update, then repository update, transaction cache on | C | `clearCurrentTransactionCache()` |
+
+### Further DLC areas
+
+| # | Prompt | Mode | Check |
+|---|--------|------|-------|
+| 64 | Order creation needs a new ID and current prices | C | `Factory` class without `@FactoryMethod` on its methods (or `@FactoryMethod` elsewhere) |
+| 65 | Calendar plans an Appointment (another aggregate) | B | `@FactoryMethod`, no object reference to Appointment |
+| 66 | Customer aggregate blocks itself on a fraud event | C | `AggregateDomainEvent` with `targetId()`, `@DomainEventListener` on the root |
+| 67 | Activate always-valid validation | C + extender | `ValidationDomainClassExtender.extend(...)` in `@PostConstruct` |
+| 68 | Read-only method totalPrice() on Order | C + extender | `@Query` / `@ExcludeValidation` |
+| 69 | Orders created via REST without id | C | `EntityIdentityProvider` |
+| 70 | GET endpoint for an order by id | C | `@PathVariable` typed `OrderId`, not `Long` |
+| 71 | Integration test for the Order repository | C | `@SpringBootTest`, no `Domain.initialize` |
+| 72 | Transactional outbox with Gruelbox | C | `GruelboxChannelFactory` beans defined explicitly, not autoconfigured (judge) |
+
+### ddd-tactical-java and setup
+
+| # | Prompt | Mode | Check |
+|---|--------|------|-------|
+| 73 | Value object EmailAddress | A | record + `IllegalArgumentException` / `requireNonNull`, no DLC |
+| 74 | Command to book a room incl. validation | C | command validates only syntactically; availability in aggregate / domain service (judge) |
+| 75 | Cancelling only while pending (application service) | C | tell, don't ask: check inside `Order.cancel()` (judge) |
+| 76 | Migrate plain-DDD Order to DLC marker types | A | `AggregateRootBase`, `concurrencyVersion`, `Identity`, no hand-written `equals` |
+| 77 | Bring OrderNotifier (uses `@ListensTo`) to DLC 3.5 conventions | C | `@DomainEventListener`, no `@ListensTo` |
+| 78 | Diagram of Order and everything connected to it | B | `includeConnectedTo` |
+| 79 | Flow diagram from PlaceOrder incl. repository implementations | C | `includeFlowsFrom` + `staticAnalysisPackages` |
+
+### Diagram Viewer
+
+| # | Prompt | Mode | Expected / check |
+|---|--------|------|------------------|
+| 80 | Start the DLC Diagram Viewer locally | B | loads `dlc-diagram-viewer` |
+| 81 | Upload our domain model incl. static analysis to the Diagram Viewer | C | loads `dlc-diagram-viewer` |
+| 82 | Starte den Diagram Viewer und lade unser Domaenenmodell hoch | B | loads `dlc-diagram-viewer` |
+| 83 | Generate an SVG diagram of the order context into the build directory | B | loads `dlc-diagrammer`, **not** `dlc-diagram-viewer` |
+| 84 | Configure the upload with static analysis (Maven) | C | goal `uploadDomainModel` (not `domainModelUpload`), `runStaticAnalysis`, API key via env variable |
+| 85 | Start the viewer with Docker Compose, how to check readiness | B | `docker compose`, `/actuator/health`, port 8090 |
+| 86 | Upload works, flow filter only shows a hint | C | `runStaticAnalysis` |
+| 87 | "Here is my API key, put it into the pom" | C | key not literal in the pom, env variable instead (judge) |

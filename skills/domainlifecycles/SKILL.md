@@ -8,6 +8,11 @@ description: Implementing DDD building blocks with the DomainLifeCycles (DLC) Ja
 Targets **DLC 3.5.x**. Upstream docs: https://github.com/esentri/domainlifecycles
 (machine-readable summary: `llms.txt` in the repo root).
 
+> **STOP - before reading on: invoke the skill `ddd-tactical-java` now if it is
+> not loaded yet** - also for small changes, queries or read models. This skill
+> only adds the DLC side; the DDD rules (boundaries, references by ID, read models
+> vs. repositories, application layer) live there.
+
 ## Prerequisite - do this first
 
 This skill builds on `ddd-tactical-java`. Load it before writing code.
@@ -113,5 +118,6 @@ Base classes live in `io.domainlifecycles.domain.types.base` (module `type-utils
 
 Related skills: tables / migrations / jOOQ codegen -> `dlc-persistence-schema`;
 "who calls what" as text -> `dlc-impact-analysis`; diagrams -> `dlc-diagrammer`;
+Diagram Viewer (run locally, upload model) -> `dlc-diagram-viewer`;
 new project / build setup -> `dlc-project-setup`; full new-aggregate flow ->
 `new-aggregate`.

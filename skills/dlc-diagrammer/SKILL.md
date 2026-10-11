@@ -1,11 +1,14 @@
 ---
 name: dlc-diagrammer
-description: Generate, configure or troubleshoot DomainLifeCycles (DLC) domain diagrams - full model, a single aggregate/bounded context, or one business flow (includeFlowsFrom / includeFlowsTo via static analysis), via the dlc-gradle-plugin / dlc-maven-plugin or the domain-diagrammer API, including mirror export and upload to the DLC Diagram Viewer. Use when the user wants to visualise, draw or analyse a domain model ("Diagramm", "Domänenmodell anzeigen", "draw the flow of X"). For call-graph answers as text use dlc-impact-analysis.
+description: Generate, configure or troubleshoot DomainLifeCycles (DLC) domain diagrams - full model, a single aggregate/bounded context, or one business flow (includeFlowsFrom / includeFlowsTo via static analysis), via the dlc-gradle-plugin / dlc-maven-plugin or the domain-diagrammer API, including mirror export. Use when the user wants to visualise, draw or analyse a domain model as diagram files ("Diagramm", "Domänenmodell anzeigen", "draw the flow of X"). For call-graph answers as text use dlc-impact-analysis; for running the DLC Diagram Viewer or uploading the model to it use dlc-diagram-viewer.
 ---
 
 # DLC domain diagrams
 
 Targets DLC 3.5.x. Upstream: `domain-diagrammer/readme.md`, `dlc-plugins/readme.md`.
+
+> **STOP - before reading on: invoke the skill `domainlifecycles` now if it is not
+> loaded yet** (mode check, marker types the diagram depends on).
 
 ## Prerequisites (check first)
 - The domain classes implement DLC marker types (Mode B is enough, see
@@ -64,9 +67,11 @@ No plugin marker artifact on the Gradle Plugin Portal: `pluginManagement` needs
   </execution></executions>
 </plugin>
 ```
-Run `mvn dlc:createDiagram@orderDiagram`. (Upstream run commands for the other
-goals don't always match the goal names - use the goal names `serializeMirror`
-and `domainModelUpload`.)
+Run `mvn dlc:createDiagram@orderDiagram`. Maven goal names (from the plugin code):
+`createDiagram`, `serializeMirror`, `uploadDomainModel`. The upstream readme is
+wrong in two places: `mvn dlc:renderJson@...` (correct: `serializeMirror`) and
+`<goal>domainModelUpload</goal>` (correct: `uploadDomainModel`). Gradle tasks:
+`createDiagram`, `serializeMirror`, `domainModelUpload`.
 
 ## Narrowing a diagram
 Structural (cheap, no static analysis):
@@ -119,9 +124,8 @@ Never hand-roll call-graph analysis - use flows here or `dlc-impact-analysis`.
 
 ## Mirror export and Diagram Viewer
 - Goal / task `serializeMirror`: writes the Domain Mirror as JSON at build time.
-- Goal `domainModelUpload`: uploads the model (optionally with the static analysis
-  result) to a Diagram Viewer instance, authenticated with an `apiKey` from the
-  viewer's profile. Never commit the API key into the build file.
+- Uploading the model (with static analysis) to the DLC Diagram Viewer, and
+  running the viewer locally with Docker Compose -> skill `dlc-diagram-viewer`.
 
 ## Troubleshooting
 - Class missing -> outside `domainModelPackages`, or no DLC marker type.
