@@ -92,8 +92,8 @@ public final class Order extends AggregateRootBase<Order.OrderId> {
   parameters). Annotated method parameters and return values are checked too.
 - Read-only methods that don't follow the getter convention (`items()`,
   `totalPrice()`, `hasStatus(...)`) are validated as well - mark them with
-  `@Query` or `@ExcludeValidation` (`io.domainlifecycles.core.validation`) to
-  exclude them.
+  `@Query` or `@ExcludeValidation` (both `io.domainlifecycles.validation.extend`,
+  module `validation-extender`) to exclude them.
 - Activate as early as possible after application start, e.g. in Spring:
   ```java
   @PostConstruct

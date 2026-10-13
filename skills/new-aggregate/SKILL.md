@@ -17,11 +17,13 @@ Follow the steps in order. Don't write production code before step 2 is confirme
    Mode A -> plain Java following `ddd-tactical-java` only.
 4. **Implement** in the bounded context's package, in this order: identities and
    value objects -> entities -> aggregate root with invariants -> creation
-   (constructor, factory method or factory) -> domain events -> repository interface ->
+   (constructor, factory method or factory) -> domain events (only those with a
+   listener) -> repository interface ->
    (Mode C) repository implementation, schema migration (load
    `dlc-persistence-schema`), application service.
 5. **Test:** one unit test per invariant (it must fail when violated);
    Mode C additionally an insert/find round-trip.
 6. **Cross-check:** every invariant from step 2 is enforced in the aggregate or a
    value object; no object references to other aggregates; changes to several
-   aggregates in one transaction only via a domain service.
+   aggregates in one transaction only via a domain service; every domain event
+   has a listener; commands are named in the imperative.

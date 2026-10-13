@@ -100,6 +100,11 @@ For a guided checklist see `references/modeling-checklist.md`.
 - Optimistic locking (a version field) on the root protects the boundary.
 
 ### Domain events
+- **Only where someone listens.** Model an event only if there is (or is built in
+  the same change) at least one listener reacting to it - in this or another
+  bounded context, or a concrete consumer behind an outbox/broker. Not every state
+  transition is an event: no "just in case" events without a listener. When
+  introducing an event, name its listener(s).
 - Named as a past-tense fact: `OrderShipped`, `PaymentReceived`.
 - Immutable.
 - Carry **only IDs and the minimal data** listeners need (typed IDs, value objects).
@@ -188,6 +193,11 @@ For a guided checklist see `references/modeling-checklist.md`.
 ### Domain commands
 - Named after the business intent (`AssignRoom`), not the data change
   (`UpdateRoomRequest`).
+- **Always grammatically imperative** - verb first, as an order to the domain:
+  `AssignRoom`, `CancelOrder`, `CheckIn`; in German `WeiseZimmerZu`,
+  `StorniereBestellung`, `CheckeEin`. Never a noun or nominalised infinitive
+  (`Einchecken`, `Checkin`, `RoomAssignment`, `Stornierung`) and
+  never past tense (that is an event).
 - Immutable; one command = one business intent = one transaction.
 - **Only syntactic validation** in the command: null, blank, format (regex), value
   ranges. No business logic and no checks against system state ("is the room
@@ -240,5 +250,8 @@ Work with their existing structure there; don't restructure them unasked.
 - `String`/`Long` parameters where a value object or typed ID belongs.
 - Validation only in the controller or DTO layer.
 - Repositories for non-root entities.
+- Domain events without any listener.
+- Commands not named in the imperative (`Einchecken`, `OrderCancellation`
+  instead of `CheckeEin`, `CancelOrder`).
 - A domain class of one bounded context referencing a type of another context.
 - A cross-context adapter calling the other context's repositories or aggregates.

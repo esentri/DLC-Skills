@@ -22,7 +22,10 @@ For each candidate aggregate:
 
 ## 4. Lifecycle
 - [ ] Which states does the root go through? Which transitions are allowed?
-- [ ] Which transitions are business facts worth a domain event?
+- [ ] Which transitions are business facts **someone reacts to**? Only those with a
+      listener (name it) become domain events.
+- [ ] Which business intents trigger the transitions? -> commands, named in the
+      imperative (`CancelOrder`, `CheckeEin`).
 
 ## 5. Identity and value objects
 - [ ] Who generates the ID (client, DB sequence, factory)?

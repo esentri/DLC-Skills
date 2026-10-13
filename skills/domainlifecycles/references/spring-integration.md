@@ -68,6 +68,10 @@ services, application services, query handlers, outbound services, factories
 - Controllers call application services, never repositories or aggregates directly.
 
 ## OpenAPI (SpringDoc)
+- **Mandatory:** `springdoc.use-fqn=true` in `application.properties` whenever
+  SpringDoc is on the classpath. The DLC OpenAPI customizer works on fully
+  qualified class names and fails at startup without it ("DLC Open API extension
+  requires the spring doc config property 'springdoc.use-fqn' to be 'true'!").
 - IDs and single-valued value objects are rendered as primitive schemas, matching
   the DLC JSON mapping; Bean Validation constraints appear in the schema.
 - Primitive fields are always marked required - use wrapper types for nullable

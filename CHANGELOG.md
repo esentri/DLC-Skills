@@ -6,6 +6,25 @@ in the README). Each release states the DomainLifeCycles version it targets.
 
 ## [Unreleased]
 
+### Added
+- `domainlifecycles` persistence reference: JDBC fetcher usage - finders via
+  `JdbcRecordMapper` (`selectByColumn`, `selectWithSql`), `RecordProvider` on a
+  dedicated `JdbcAggregateFetcher`, fetcher outside a repository.
+- `ddd-tactical-java`: domain commands are always named in the imperative
+  (`CancelOrder`, `CheckeEin` - not `Einchecken`); domain events only where a
+  listener exists. Both also in the modelling checklist, review red flags and
+  `new-aggregate`.
+- `domainlifecycles`: with the validation extender, read-only non-getter methods
+  get `@Query` - rule now in SKILL.md itself, not only in the validation reference.
+- Evals #89-#92: imperative command name, events only with listener, `@Query`
+  import, `springdoc.use-fqn`.
+- `domainlifecycles` Spring reference: `springdoc.use-fqn=true` is mandatory with
+  SpringDoc (also in `dlc-project-setup`).
+
+### Fixed
+- `domainlifecycles` validation reference: `@Query` / `@ExcludeValidation` are in
+  `io.domainlifecycles.validation.extend`, not `io.domainlifecycles.core.validation`.
+
 ## [0.9.0] - 2026-10-09
 
 Targets **DomainLifeCycles 3.5.x**.

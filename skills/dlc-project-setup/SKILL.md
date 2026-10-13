@@ -64,7 +64,8 @@ External libraries - starter features stay **silently off** without them:
   3.19.x, e.g. via `<jooq.version>`; on Java 21 the Spring Boot 4.1 managed version
   works)
 - JDBC driver for the database
-- Spring Web (web integration), SpringDoc (OpenAPI), spring-tx (transactional events)
+- Spring Web (web integration), SpringDoc (OpenAPI - requires
+  `springdoc.use-fqn=true`), spring-tx (transactional events)
 - Bean Validation: a provider such as Hibernate Validator (without it constraints
   are skipped with only a warning); Byte Buddy for the validation extender
 - Lombok (optional builders), Gruelbox (outbox)

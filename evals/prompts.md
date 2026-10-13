@@ -63,7 +63,7 @@ realistically in the sandbox - check it in a real project session.
 
 ## 4. Rule adherence (check the generated code)
 
-Automated as cases `r43`-`r79`. Mode `C-JDBC` = like C, but plain-JDBC persistence (no jOOQ).
+Automated as cases `r43`-`r79` and `r88`-`r92`. Mode `C-JDBC` = like C, but plain-JDBC persistence (no jOOQ).
 
 | # | Prompt | Mode | Check |
 |---|--------|------|-------|
@@ -89,7 +89,8 @@ Automated as cases `r43`-`r79`. Mode `C-JDBC` = like C, but plain-JDBC persisten
 | 57 | Migration for Customer with UUID identity | C | `UUID` / `CHAR(36)`, no `customer_id_seq` |
 | 58 | Migration for Invoice referencing Order by OrderId | C | no silent FK between aggregates - leave out with reason or ask (judge) |
 | 59 | Configure jOOQ code generation for DLC | C | `recordVersionFields` = `CONCURRENCY_VERSION` |
-| 60 | Repository method returning pending orders page by page | C | root records sorted + paged, `fetchDeep` - no hand-written joins (judge) |
+| 60 | Repository method returning pending orders page by page | C | jOOQ query on root records sorted (`.orderBy(`) + paged, `fetchDeep` - no hand-written joins, no JDBC helpers (judge) |
+| 88 | Same as 60 | C-JDBC | `JdbcRecordMapper.selectWithSql` on root rows (`ORDER BY`, `?` params), `fetchDeep`, provider from `JdbcDomainPersistenceProvider`, no jOOQ (judge) |
 | 61 | Implement the Order repository | C-JDBC | `JdbcAggregateRepository` + `JdbcDomainPersistenceProvider`, no `DSLContext` |
 | 62 | Two users edit the same order | C | optimistic locking via `concurrencyVersion`, reload/report on conflict (judge) |
 | 63 | Bulk SQL update, then repository update, transaction cache on | C | `clearCurrentTransactionCache()` |
@@ -103,6 +104,8 @@ Automated as cases `r43`-`r79`. Mode `C-JDBC` = like C, but plain-JDBC persisten
 | 66 | Customer aggregate blocks itself on a fraud event | C | `AggregateDomainEvent` with `targetId()`, `@DomainEventListener` on the root |
 | 67 | Activate always-valid validation | C + extender | `ValidationDomainClassExtender.extend(...)` in `@PostConstruct` |
 | 68 | Read-only method totalPrice() on Order | C + extender | `@Query` / `@ExcludeValidation` |
+| 91 | Read-only method hasStatus(OrderStatus) on Order | C + extender | import from `io.domainlifecycles.validation.extend`, not `core.validation` |
+| 92 | Add SpringDoc for the REST API | C | `springdoc.use-fqn=true` |
 | 69 | Orders created via REST without id | C | `EntityIdentityProvider` |
 | 70 | GET endpoint for an order by id | C | `@PathVariable` typed `OrderId`, not `Long` |
 | 71 | Integration test for the Order repository | C | `@SpringBootTest`, no `Domain.initialize` |
@@ -119,6 +122,8 @@ Automated as cases `r43`-`r79`. Mode `C-JDBC` = like C, but plain-JDBC persisten
 | 77 | Bring OrderNotifier (uses `@ListensTo`) to DLC 3.5 conventions | C | `@DomainEventListener`, no `@ListensTo` |
 | 78 | Diagram of Order and everything connected to it | B | `includeConnectedTo` |
 | 79 | Flow diagram from PlaceOrder incl. repository implementations | C | `includeFlowsFrom` + `staticAnalysisPackages` |
+| 89 | Lege den Befehl an, mit dem ein Gast eincheckt | A | command named in the imperative (`CheckeEin`), not `Einchecken` (judge) |
+| 90 | Invoice aggregate with states DRAFT/ISSUED/PAID/CANCELLED | C | no domain events without a listener (judge) |
 
 ### Diagram Viewer
 

@@ -99,6 +99,10 @@ Base classes live in `io.domainlifecycles.domain.types.base` (module `type-utils
 - Invariants are checked on construction. Style (unless `AGENTS.md` says otherwise):
   - `validation-extender` in the build -> Bean Validation annotations wherever
     they can express the rule, the rest via `DomainAssertions` in `validate()`.
+    The extender validates after **every non-getter method** - so any read-only
+    method not named `get*`/`is*` without parameters (`hasStatus(...)`,
+    `totalPrice()`, `items()`) gets `@Query`
+    (`import io.domainlifecycles.validation.extend.Query;`).
   - no validation extender -> `DomainAssertions` only, called from the constructor.
   Details: `references/validation.md`.
 - References to other aggregates are typed `Identity` fields, never object references

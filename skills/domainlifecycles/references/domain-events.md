@@ -17,8 +17,9 @@ The project's `AGENTS.md` field `Event publishing` decides:
   `publishEvent(event)` there; aggregates return or collect the event instead of
   publishing themselves. Don't introduce `DomainEvents.publish` in such projects.
 
-The event rules (past-tense name, record implementing `DomainEvent`, IDs +
-minimal data, `@Publishes` on the publishing method) apply either way.
+The event rules (only with a listener, past-tense name, record implementing
+`DomainEvent`, IDs + minimal data, `@Publishes` on the publishing method) apply
+either way.
 
 ## Publishing with DomainEvents
 ```java
@@ -88,6 +89,9 @@ For reliable delivery to external brokers use `domain-events-gruelbox`
 the aggregate.
 
 ## Rules
+- Only publish an event that has at least one listener (`@DomainEventListener`,
+  or a concrete consumer behind outbox/broker) - write the listener in the same
+  change. No events "just in case".
 - Event name = past-tense fact; immutable record.
 - Payload = typed IDs + minimal data (value objects). Never aggregates or entities -
   also not for in-memory channels (upstream examples like `OrderShipped(Order order)`
