@@ -11,9 +11,10 @@
       "name": "ddd-tactical-java",
       "source": "./",
       "strict": false,
-      "description": "Tactical DDD modelling and implementation rules for Java, framework-agnostic",
+      "description": "Tactical DDD modelling and implementation rules for Java, framework-agnostic, plus ubiquitous language glossary and checks",
       "skills": [
-        "./skills/ddd-tactical-java"
+        "./skills/ddd-tactical-java",
+        "./skills/ubiquitous-language"
       ]
     },
     {

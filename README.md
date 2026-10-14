@@ -13,6 +13,7 @@ Targets **DLC 3.5.x**.
 | Skill | Plugin | Purpose | Triggered by |
 |-------|--------|---------|--------------|
 | `ddd-tactical-java` | `ddd-tactical-java` | Framework-agnostic tactical DDD: bounded contexts, invariants, building blocks, application layer, outbound ports, package layout, review red flags, modelling checklist | DDD vocabulary (aggregate, invariant, value object, bounded context ...) |
+| `ubiquitous-language` | `ddd-tactical-java` | Glossary of domain terms (`docs/ubiquitous-language.md`): build it from code with questions to the user, check code / changes against it; new terms are added as candidates automatically while implementing | "glossary", "domain terms", "check naming against the ubiquitous language" (also German) |
 | `domainlifecycles` | `domainlifecycles` | DLC marker types and runtime modules; detects mode A/B/C and loads only the references for the modules in use | DLC types / `io.domainlifecycles` in the build, "DLC" |
 | `dlc-persistence-schema` | `domainlifecycles` | Tables, sequences, FKs and migrations for DLC aggregates; jOOQ codegen; mapping errors | "migration", "table for aggregate", codegen / mapping errors |
 | `dlc-impact-analysis` | `domainlifecycles` | Call graph and flows as text via DLC static analysis | "who calls X", "what happens after command Y", impact of a change |
@@ -30,6 +31,7 @@ be used in any Java project.
 .claude-plugin/marketplace.json     Claude Code marketplace (2 plugins)
 skills/
   ddd-tactical-java/                SKILL.md + references/modeling-checklist.md
+  ubiquitous-language/              SKILL.md + references/glossary-template.md
   domainlifecycles/                 SKILL.md (router) + references/<one file per DLC module>
   dlc-persistence-schema/           SKILL.md + references/ddl-example.md
   dlc-impact-analysis/
@@ -59,7 +61,7 @@ The marketplace is `dlc-plugins` (`.claude-plugin/marketplace.json`) with two pl
 
 | Plugin | Skills |
 |---|---|
-| `ddd-tactical-java` | `ddd-tactical-java` |
+| `ddd-tactical-java` | `ddd-tactical-java`, `ubiquitous-language` |
 | `domainlifecycles` | `domainlifecycles`, `dlc-persistence-schema`, `dlc-impact-analysis`, `dlc-diagrammer`, `dlc-diagram-viewer`, `dlc-project-setup`, `new-aggregate` (enable together with `ddd-tactical-java`) |
 
 **Per project (preferred):** commit one of the templates as `.claude/settings.json`

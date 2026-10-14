@@ -6,6 +6,14 @@ in the README). Each release states the DomainLifeCycles version it targets.
 
 ## [Unreleased]
 
+### Added
+- `ubiquitous-language` (plugin `ddd-tactical-java`): glossary of domain terms in
+  `docs/ubiquitous-language.md` - `build` from existing code (per bounded context,
+  candidates, questions to the user instead of guesses), `check` code or changes
+  against it. While implementing, new domain terms are added as `candidate`
+  automatically (rule in `ddd-tactical-java`, only if the glossary exists).
+  `Glossary:` line in `templates/AGENTS.md.snippet`; `new-aggregate` uses the glossary.
+
 ## [0.9.0] - 2026-10-13
 
 Targets **DomainLifeCycles 3.5.x**.

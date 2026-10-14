@@ -34,6 +34,7 @@ CASES = EVALS / "cases"
 ALL_SKILLS = [
     "ddd-tactical-java", "domainlifecycles", "dlc-persistence-schema",
     "dlc-impact-analysis", "dlc-diagrammer", "dlc-diagram-viewer", "dlc-project-setup", "new-aggregate",
+    "ubiquitous-language",
 ]
 # new-aggregate has disable-model-invocation: Claude Code must never load it on its own.
 ALWAYS_FORBIDDEN = ["new-aggregate"]

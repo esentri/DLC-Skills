@@ -11,7 +11,15 @@ Library-specific skills build on top of these rules and never replace them.
 ## Workflow: model first, code second
 
 1. **Clarify the language.** Name the concepts with the domain expert's terms. If a
-   term is ambiguous, ask instead of inventing one.
+   term is ambiguous, ask instead of inventing one. If the project has a glossary
+   (`Glossary:` in `AGENTS.md`, default `docs/ubiquitous-language.md`):
+   - use its `confirmed` terms; never a term listed under `Avoid` or `deprecated`,
+   - every new domain concept you introduce (type, event, command, business
+     method) -> append it as a `candidate` row (format and rules: skill
+     `ubiquitous-language`); no questions, never mark anything `confirmed`,
+   - list the added candidates in one line at the end of your answer.
+   No glossary file -> the glossary rules don't apply: don't create one, don't
+   write glossary rows or candidate lists in the answer.
 2. **Find the invariants.** List the business rules that must hold *at all times*
    (not "eventually"). These decide the aggregate boundaries.
 3. **Cut the aggregates.** One aggregate = one consistency boundary. Keep it as

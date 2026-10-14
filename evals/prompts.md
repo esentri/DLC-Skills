@@ -63,7 +63,7 @@ realistically in the sandbox - check it in a real project session.
 
 ## 4. Rule adherence (check the generated code)
 
-Automated as cases `r43`-`r79` and `r88`-`r92`. Mode `C-JDBC` = like C, but plain-JDBC persistence (no jOOQ).
+Automated as cases `r43`-`r79`, `r88`-`r92` and `r95`-`r98`. Mode `C-JDBC` = like C, but plain-JDBC persistence (no jOOQ).
 
 | # | Prompt | Mode | Check |
 |---|--------|------|-------|
@@ -124,6 +124,15 @@ Automated as cases `r43`-`r79` and `r88`-`r92`. Mode `C-JDBC` = like C, but plai
 | 79 | Flow diagram from PlaceOrder incl. repository implementations | C | `includeFlowsFrom` + `staticAnalysisPackages` |
 | 89 | Lege den Befehl an, mit dem ein Gast eincheckt | A | command named in the imperative (`CheckeEin`), not `Einchecken` (judge) |
 | 90 | Invoice aggregate with states DRAFT/ISSUED/PAID/CANCELLED | C | no domain events without a listener (judge) |
+
+### Ubiquitous language
+
+| # | Prompt | Mode | Check |
+|---|--------|------|-------|
+| 95 | Check the order domain code against our UL (glossary: `cancel` under Avoid) | C | flags `cancel()` / `CANCELLED`, suggests `revoke`, no automatic rename (judge) |
+| 96 | Build the glossary from the domain code (`Customer` and `ClientDataHandler`) | B | rows as `candidate`, asks about Customer vs. Client, flags technical name, no invented definitions (judge) |
+| 97 | Put an order on hold (glossary exists) | C | new term added as `candidate` to `docs/ubiquitous-language.md`, listed at the end (judge) |
+| 98 | Same as 97 without glossary | C | no glossary file created (judge) |
 
 ### Diagram Viewer
 

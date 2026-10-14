@@ -10,7 +10,9 @@ Follow the steps in order. Don't write production code before step 2 is confirme
 
 1. **Load `ddd-tactical-java`.** Work through its
    `references/modeling-checklist.md` with the developer: language, invariants,
-   boundary, lifecycle, IDs, value objects, events.
+   boundary, lifecycle, IDs, value objects, events. If the project has a glossary
+   (skill `ubiquitous-language`), take the terms from it and resolve open
+   questions of the terms involved here.
 2. **Summarise the model** (roots, entities, value objects, invariants, events,
    references by ID) in max. 15 lines and get confirmation.
 3. **Load `domainlifecycles`** and determine the mode from the build file.
@@ -26,4 +28,5 @@ Follow the steps in order. Don't write production code before step 2 is confirme
 6. **Cross-check:** every invariant from step 2 is enforced in the aggregate or a
    value object; no object references to other aggregates; changes to several
    aggregates in one transaction only via a domain service; every domain event
-   has a listener; commands are named in the imperative.
+   has a listener; commands are named in the imperative; new terms are in the
+   glossary as `candidate` (if the project has one).
