@@ -94,13 +94,98 @@ public final class Order extends AggregateRootBase<Order.OrderId> {
   `totalPrice()`, `hasStatus(...)`) are validated as well - mark them with
   `@Query` or `@ExcludeValidation` (both `io.domainlifecycles.validation.extend`,
   module `validation-extender`) to exclude them.
-- Activate as early as possible after application start, e.g. in Spring:
-  ```java
-  @PostConstruct
-  public void postConstruct() {
-      ValidationDomainClassExtender.extend(List.of("com.example.shop"));
-  }
-  ```
+- `validate()` runs **before** the Bean Validation constraints. Cross-field
+  checks in `validate()` must be null-safe (skip them while a `@NotNull` field is
+  still null) - otherwise a missing value ends in a `NullPointerException`
+  instead of the `DomainAssertionException` from `@NotNull`.
+
+## Activating the validation extender
+
+Choose by the DLC version in the build file:
+
+| DLC version | Activation in the application |
+|---|---|
+| 3.5.1 and later | `@PostConstruct` in the Spring Boot application class (DLC docs) |
+| 3.5.0 and earlier | first statement in `main`, before `SpringApplication.run` |
+
+DLC 3.5.1+ (as recommended by the DLC docs):
+```java
+@EnableDlc(dlcMirrorBasePackages = ShopApplication.DOMAIN_BASE_PACKAGE)
+@SpringBootApplication
+public class ShopApplication {
+
+    public static final String DOMAIN_BASE_PACKAGE = "com.example.shop";
+
+    public static void main(String[] args) {
+        SpringApplication.run(ShopApplication.class, args);
+    }
+
+    @PostConstruct
+    public void postConstruct() {
+        ValidationDomainClassExtender.extend(DOMAIN_BASE_PACKAGE);
+    }
+}
+```
+DLC <= 3.5.0 - bug: a domain class loaded for the first time *during* the
+activation stays unextended, silently (e.g. a value object only referenced by a
+command record Spring already loaded while creating the beans - invalid value
+objects are then accepted). `@PostConstruct` is affected; activate before any
+domain class is loaded instead:
+```java
+public static void main(String[] args) {
+    // DLC <= 3.5.0: before any domain class is loaded (fixed in 3.5.1, then @PostConstruct)
+    ValidationDomainClassExtender.extend(DOMAIN_BASE_PACKAGE);
+    SpringApplication.run(ShopApplication.class, args);
+}
+```
+- Signature in 3.5: `extend(String... basePackages)`. Older versions of the
+  upstream readme show `extend(List.of(...))` - that does not compile.
+- Parameters: the same base package(s) as the mirror (`dlcMirrorBasePackages` /
+  `Domain base package` in `AGENTS.md`) - keep them in one constant. Matching is
+  a plain **string prefix** on the package name: sub-packages are included, but
+  so are siblings with the same prefix (`com.example.shop` also covers
+  `com.example.shopping`). A misspelled package or no argument extends nothing,
+  without any error. Only concrete `Validatable` classes are touched, so passing
+  the base package is enough - never list single classes.
+- Use the plain `extend(String...)`. The overload
+  `extend(DomainBuilderConfiguration, String...)` only excludes a non-static
+  method named like the builder method from validation; the DLC autoconfig uses
+  the default builder configuration itself, so there is nothing to align.
+- Effective **once per JVM**: further calls are ignored (log
+  `DLCDomainExtensions already processed!`), also with other packages - pass all
+  base packages in the first call.
+- The log lines `<class> extended validate call!` list only the classes already
+  loaded at activation time - not a complete list of extended classes.
+- Plain Java without Spring: call `extend(...)` first thing in `main`, before
+  `Domain.initialize(...)`.
+
+### Tests - always register a launcher session listener
+Plain unit tests have no Spring context, so the activation in the application
+class never runs there - the result would depend on whether a Spring test ran
+before in the same JVM. Activate the extender once per test JVM, before any test
+runs (with DLC <= 3.5.0 this also avoids the bug above):
+```java
+// src/test/java/com/example/shop/ValidationExtenderLauncherSessionListener.java
+public class ValidationExtenderLauncherSessionListener implements LauncherSessionListener {
+
+    @Override
+    public void launcherSessionOpened(LauncherSession session) {
+        ValidationDomainClassExtender.extend(ShopApplication.DOMAIN_BASE_PACKAGE);
+    }
+}
+```
+```text
+# src/test/resources/META-INF/services/org.junit.platform.launcher.LauncherSessionListener
+com.example.shop.ValidationExtenderLauncherSessionListener
+```
+- Needs `org.junit.platform:junit-platform-launcher` on the test **compile**
+  classpath (Gradle `testImplementation`, Maven scope `test`).
+- The later call from the application class in a `@SpringBootTest` is ignored -
+  harmless.
+- Don't call `extend(...)` in `@BeforeAll` of single test classes instead - only
+  the first call per JVM counts, so the result depends on which tests run.
+- Byte Buddy attaches an agent at runtime: add `-XX:+EnableDynamicAgentLoading`
+  to the JVM args of tests and `bootRun` to silence the JDK 21+ warning.
 
 ## Gotchas
 - Without a Bean Validation provider (e.g. Hibernate Validator) at runtime,

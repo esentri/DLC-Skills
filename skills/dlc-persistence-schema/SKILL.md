@@ -158,6 +158,30 @@ CREATE SEQUENCE order_action_codes_seq START WITH 1000;
 - Schema read once at startup (`JdbcSchemaMetadata.read(...)`) from the **fully
   migrated** database -> migrations must run before the persistence provider is built.
   Optional narrowing: `dlc.features.persistence.jdbc.schema-pattern`.
+- **Spring Boot + Flyway / Liquibase: always add this detector.** The DLC autoconfig's
+  `JdbcSchemaMetadata` bean is not ordered after the migrations; without it startup
+  fails with `Couldn't find table for '<Aggregate>'` (or misses new columns). Spring
+  Boot's own mechanism orders the bean after Flyway / Liquibase / SQL init (works for
+  Boot 3 and 4, same package):
+  ```java
+  package com.example.shop.configuration;
+
+  public class DlcSchemaDependsOnDatabaseInitializationDetector
+          extends AbstractBeansOfTypeDependsOnDatabaseInitializationDetector {
+
+      @Override
+      protected Set<Class<?>> getDependsOnDatabaseInitializationBeanTypes() {
+          return Set.of(JdbcSchemaMetadata.class);  // io.domainlifecycles.jdbc.schema
+      }
+  }
+  ```
+  ```properties
+  # src/main/resources/META-INF/spring.factories
+  org.springframework.boot.sql.init.dependency.DependsOnDatabaseInitializationDetector=\
+  com.example.shop.configuration.DlcSchemaDependsOnDatabaseInitializationDetector
+  ```
+  The detector is registered via `spring.factories`, not as a bean. Without Spring
+  Boot: run the migrations first, then build the persistence provider.
 - Reserved words / case-sensitive names (e.g. table `ORDER`): default SQL is unquoted;
   use a `JdbcDialect` overriding `quoteIdentifier(...)`.
 - No codegen flags: `JdbcPersister` checks/increments `CONCURRENCY_VERSION` itself and
@@ -186,5 +210,6 @@ CREATE SEQUENCE order_action_codes_seq START WITH 1000;
 | Concurrent updates not detected | jOOQ: `recordVersionFields` missing in codegen or optimistic locking off at runtime |
 | Insert fails on id generation | sequence missing or misnamed (`<ID>_SEQ`, `<TABLE>_SEQ`) |
 | JDBC: syntax error on `ORDER` etc. | identifier needs quoting - `quoteIdentifier` |
-| JDBC: new column/table ignored | schema snapshot read before migration, restart after migrating |
+| JDBC + Flyway/Liquibase: `Couldn't find table for '...'` at startup, table exists after migration | `JdbcSchemaMetadata` built before the migrations ran - register the `DependsOnDatabaseInitializationDetector` (see "JDBC backend specifics") |
+| JDBC: new column/table ignored | schema snapshot read before migration (detector missing), or migration applied to a running app - restart |
 | Self/duplicate FK relation not loaded | needs a `RecordProvider` |

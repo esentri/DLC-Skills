@@ -79,6 +79,14 @@ External libraries - starter features stay **silently off** without them:
   `dlc.features.persistence.jooq-record-package` (= codegen `packageName`) and
   `sql-dialect`.
 - **JDBC:** no codegen; choose when build-time DB access or jOOQ licensing is a problem.
+  - The starters bring the jOOQ integration as well, and jOOQ wins when usable:
+    exclude `io.domainlifecycles:jooq-integration` and `org.jooq` in the build
+    (or set `dlc.features.persistence.jooq.enabled=false`).
+  - **With Flyway / Liquibase, always** register a
+    `DependsOnDatabaseInitializationDetector` for `JdbcSchemaMetadata` - the DLC
+    autoconfig reads the schema once at startup and is not ordered after the
+    migrations (symptom: `Couldn't find table for '...'`). Code: skill
+    `dlc-persistence-schema`, "JDBC backend specifics".
 - Schema, migrations and codegen settings (incl. `recordVersionFields`): load the
   skill `dlc-persistence-schema`. Repositories: `domainlifecycles`,
   `references/persistence.md`.
@@ -91,9 +99,14 @@ External libraries - starter features stay **silently off** without them:
 - Without Spring autoconfig (plain Java, or plain unit tests without a Spring
   context): `Domain.initialize(new ReflectiveDomainMirrorFactory("com.example.shop"))`
   once at startup / in the test setup.
-- Validation is **not** autoconfigured: with the validation extender call
-  `ValidationDomainClassExtender.extend(...)` early (e.g. `@PostConstruct`), see
-  `domainlifecycles`, `references/validation.md`.
+- Validation is **not** autoconfigured. With the validation extender call
+  `ValidationDomainClassExtender.extend(...)` with the same base package(s) as
+  `dlcMirrorBasePackages` (one constant) in a `@PostConstruct`
+  method of the Spring Boot application class (DLC docs, DLC 3.5.1+) - with DLC
+  3.5.0 as first statement in `main` instead (bug: classes loaded during the
+  activation stay unextended) - **and** register the JUnit
+  `LauncherSessionListener` for plain unit tests. Code: `domainlifecycles`,
+  `references/validation.md`, "Activating the validation extender".
 - With the Spring starter, service kinds (repositories, domain/application
   services, query handlers, outbound services, factories) become beans
   automatically - don't annotate them with `@Service`/`@Component`.
@@ -111,6 +124,9 @@ The plugin is independent of the starters.
 - Build compiles, a smoke test loads the mirror (`Domain` initialised, a known
   aggregate is resolvable).
 - Mode C: an insert + `findById` round-trip test for one aggregate.
+- Validation extender: a plain unit test **and** a `@SpringBootTest` each expect
+  a `DomainAssertionException` for an invalid value object (e.g. a `@NotNull`
+  field set to null).
 
 ## Moving from Mode A to Mode B
 Makes the existing model explicit and diagrammable; runtime behaviour does not change.

@@ -13,7 +13,10 @@ Tables, columns, sequences, migrations and jOOQ codegen: load the skill
   jOOQ version managed by Spring Boot 4.1 (3.21) is fine; Java 17 projects need
   jOOQ 3.19.x (jOOQ 3.21 requires Java 21).
 - **JDBC** (`JdbcAggregateRepository`) if the team cannot or will not run jOOQ
-  codegen (no build-time DB, licensing). Reads the schema at runtime.
+  codegen (no build-time DB, licensing). Reads the schema once at startup - with
+  Spring Boot + Flyway/Liquibase it needs the `DependsOnDatabaseInitializationDetector`
+  from `dlc-persistence-schema` ("JDBC backend specifics"), otherwise startup fails
+  with `Couldn't find table for '...'`.
 - The Spring starters contain both; jOOQ wins when usable (see
   `spring-integration.md` for the toggles).
 

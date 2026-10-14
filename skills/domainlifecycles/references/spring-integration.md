@@ -79,6 +79,13 @@ services, application services, query handlers, outbound services, factories
 
 ## Troubleshooting
 - jOOQ records not found -> rebuild (codegen) and check `jooqRecordPackage`.
+- JDBC + Flyway/Liquibase: `Couldn't find table for '...'` -> schema read before
+  the migrations; register the `DependsOnDatabaseInitializationDetector` from
+  `dlc-persistence-schema` ("JDBC backend specifics").
+- Validation not applied in plain unit tests / only in some tests -> launcher
+  session listener missing; some value objects not validated with DLC 3.5.0 ->
+  activate in `main` instead of `@PostConstruct`. See `validation.md`,
+  "Activating the validation extender".
 - Debug: `logging.level.io.domainlifecycles.autoconfig=DEBUG`.
 - DLC < 3.5 on Spring Boot 4.1+: jOOQ and Jackson autoconfig silently don't run -
   upgrade DLC.

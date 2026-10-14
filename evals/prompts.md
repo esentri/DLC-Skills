@@ -28,7 +28,7 @@ evals/run.sh --case 'r4*'             # subset by name: one --case, simple * glo
 | 1. Triggering | #1-#31, #80-#83, #93-#94 | `t..` | expected skills loaded, forbidden not loaded, references read |
 | 2. Negative tests | #32-#35 (+ `new-aggregate` forbidden everywhere = #36) | `n..` | forbidden skills not loaded |
 | 3. AGENTS.md activation | #38-#42 | `a..` | skills + regexes / LLM judge on the answer, with per-case `AGENTS.md` variants |
-| 4. Rule adherence | #43-#79, #84-#92, #95-#98 | `r..` | regexes on the answer (deterministic) + LLM judge (Haiku, 3 votes) for rules regexes can't express |
+| 4. Rule adherence | #43-#79, #84-#92, #95-#99 | `r..` | regexes on the answer (deterministic) + LLM judge (Haiku, 3 votes) for rules regexes can't express |
 
 - `evals/generate.py` turns the JSON into `evals/cases/<case>/case.yaml` + `setup.sh`
   (scaffolds the sample project; `agents` overrides lines of `AGENTS.md`, `legacy`
@@ -63,7 +63,7 @@ realistically in the sandbox - check it in a real project session.
 
 ## 4. Rule adherence (check the generated code)
 
-Automated as cases `r43`-`r79`, `r84`-`r92` and `r95`-`r98`.
+Automated as cases `r43`-`r79`, `r84`-`r92` and `r95`-`r99`.
 
 | # | Prompt | Mode | Check |
 |---|--------|------|-------|
@@ -102,10 +102,11 @@ Automated as cases `r43`-`r79`, `r84`-`r92` and `r95`-`r98`.
 | 64 | Order creation needs a new ID and current prices | C | `Factory` class without `@FactoryMethod` on its methods (or `@FactoryMethod` elsewhere) |
 | 65 | Calendar plans an Appointment (another aggregate) | B | `@FactoryMethod`, no object reference to Appointment |
 | 66 | Customer aggregate blocks itself on a fraud event | C | `AggregateDomainEvent` with `targetId()`, `@DomainEventListener` on the root |
-| 67 | Activate always-valid validation | C + extender | `ValidationDomainClassExtender.extend(...)` in `@PostConstruct` |
+| 67 | Activate always-valid validation | C + extender | DLC 3.5.0: `ValidationDomainClassExtender.extend(...)` in `main` before `SpringApplication.run` (judge), `LauncherSessionListener` for tests, no `extend(List.of(...))` |
 | 68 | Read-only method totalPrice() on Order | C + extender | `@Query` / `@ExcludeValidation` |
 | 91 | Read-only method hasStatus(OrderStatus) on Order | C + extender | import from `io.domainlifecycles.validation.extend`, not `core.validation` |
 | 92 | Add SpringDoc for the REST API | C | `springdoc.use-fqn=true` |
+| 99 | Startup fails with "Couldn't find table" although Flyway created it | C-JDBC | `DependsOnDatabaseInitializationDetector` for `JdbcSchemaMetadata`, registered in `spring.factories` |
 | 69 | Orders created via REST without id | C | `EntityIdentityProvider` |
 | 70 | GET endpoint for an order by id | C | `@PathVariable` typed `OrderId`, not `Long` |
 | 71 | Integration test for the Order repository | C | `@SpringBootTest`, no `Domain.initialize` |

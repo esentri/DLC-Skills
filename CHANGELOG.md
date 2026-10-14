@@ -6,6 +6,30 @@ in the README). Each release states the DomainLifeCycles version it targets.
 
 ## [Unreleased]
 
+### Fixed
+- JDBC backend + Flyway/Liquibase with the Spring starter: the DLC autoconfig read
+  the schema before the migrations ran (`Couldn't find table for '...'`).
+  `dlc-persistence-schema` now always adds a `DependsOnDatabaseInitializationDetector`
+  for `JdbcSchemaMetadata` (registered in `spring.factories`); `dlc-project-setup`,
+  `persistence.md` and `spring-integration.md` point to it.
+- Validation extender activation (`validation.md`, `dlc-project-setup`): with DLC
+  3.5.1+ `@PostConstruct` in the application class as recommended by the DLC docs;
+  with DLC 3.5.0 as first statement in `main` - 3.5.0 silently leaves classes
+  unextended that are loaded during the activation (fixed in DLC 3.5.1). Varargs
+  signature `extend(String...)` (the upstream `extend(List.of(...))` does not
+  compile); effective once per JVM; parameters are the mirror base packages (one
+  constant), matched as string prefix; the `DomainBuilderConfiguration` overload is
+  not needed. Plain unit tests get a JUnit
+  `LauncherSessionListener` that activates the extender once per test JVM.
+  `validate()` runs before Bean Validation - cross-field checks must be null-safe.
+- `dlc-project-setup`: JDBC backend excludes the jOOQ integration the starter brings
+  along; verification includes an invalid value object in a unit and a Spring test.
+
+### Changed
+- Eval #67 expects the activation in `main` (sample project uses DLC 3.5.0, judge) and
+  the launcher session listener, and forbids `extend(List.of(...))`; new eval #99
+  (JDBC + Flyway startup ordering).
+
 ## [0.10.0] - 2026-10-14
 
 Targets **DomainLifeCycles 3.5.x**.
