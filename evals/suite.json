@@ -1,5 +1,5 @@
 {
-  "_comment": "Source of truth for the automated evals (evals/prompts.md sections 1-4). Edit here; evals/run.sh regenerates evals/cases/ via evals/generate.py (see its docstring for all fields). Modes: none (empty Java project, no AGENTS.md), A (plain DDD), B (DLC marker types), C (Spring Boot 4 + DLC spring-boot-starter + jOOQ, Java 21).",
+  "_comment": "Source of truth for the automated evals (evals/prompts.md sections 1-4). Edit here; evals/run.sh regenerates evals/cases/ via evals/generate.py (see its docstring for all fields). Modes: none (empty Java project, no AGENTS.md), A (plain DDD), B (DLC marker types), C (Spring Boot 4 + DLC spring-boot-starter + jOOQ, Java 21), C-JDBC (like C with plain-JDBC persistence).",
   "cases": [
     {"id": 1, "mode": "A", "prompt": "Build a value object Money with currency.", "expect": ["ddd-tactical-java"], "forbid": ["domainlifecycles"]},
     {"id": 2, "mode": "B", "prompt": "Build a value object Money with currency.", "expect": ["ddd-tactical-java", "domainlifecycles"], "reads": ["marker-types.md"]},

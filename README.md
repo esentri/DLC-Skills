@@ -22,10 +22,10 @@ Targets **DLC 3.5.x**.
 | `dlc-project-setup` | `domainlifecycles` | Mode decision (A/B/C), adding DLC, A -> B migration, persistence backend, bootstrap, upgrades | new project / migration / upgrade |
 | `new-aggregate` | `domainlifecycles` | Explicit workflow: model -> implement -> test | manual (`/new-aggregate`); Claude Code never triggers it automatically (`disable-model-invocation`), other agents may |
 
-Modes are cumulative: **A** plain DDD (only `ddd-tactical-java`) ⊂ **B** DLC marker
-types ⊂ **C** DLC runtime. All DLC skills build on `domainlifecycles`, which always
-loads `ddd-tactical-java` first; `ddd-tactical-java` never references DLC, so it can
-be used in any Java project.
+Modes are cumulative: **A** plain DDD (only the plugin `ddd-tactical-java`) ⊂ **B** DLC
+marker types ⊂ **C** DLC runtime. All DLC skills build on `domainlifecycles`, which always
+loads `ddd-tactical-java` first; `ddd-tactical-java` and `ubiquitous-language` never
+reference DLC, so they can be used in any Java project.
 
 ```
 .claude-plugin/marketplace.json     Claude Code marketplace (2 plugins)
@@ -78,7 +78,7 @@ Plain-DDD projects without DLC only enable `ddd-tactical-java@dlc-plugins`.
 **Manually / fallback** (if the project settings are not picked up):
 ```bash
 claude plugin marketplace add esentri/DLC-Skills          # latest
-claude plugin marketplace add esentri/DLC-Skills#v0.9.0   # pinned release
+claude plugin marketplace add esentri/DLC-Skills#v0.10.0   # pinned release
 claude plugin install ddd-tactical-java@dlc-plugins
 claude plugin install domainlifecycles@dlc-plugins
 ```
@@ -92,8 +92,8 @@ nothing has to be registered anywhere.
 # into the current project (default), all skills of this repo
 npx skills add esentri/DLC-Skills --skill '*'
 
-# plain DDD projects: only the framework-agnostic skill
-npx skills add esentri/DLC-Skills --skill ddd-tactical-java
+# plain DDD projects: only the framework-agnostic skills
+npx skills add esentri/DLC-Skills --skill ddd-tactical-java ubiquitous-language
 
 # options: -a <agent> (e.g. -a codex -a cursor), -g (global, user directory),
 #          --copy (copy instead of symlink), -y (no prompts)
@@ -145,9 +145,9 @@ per user via `/plugin` -> Marketplaces -> `dlc-plugins` -> Enable auto-update.
 2. Run `evals/run.sh` (automated suite) and check #37 manually.
 3. Move the `[Unreleased]` entries in `CHANGELOG.md` to the new version with date
    and targeted DLC version.
-4. Tag and push: `git tag -a vX.Y.Z -m "vX.Y.Z" && git push origin vX.Y.Z`.
-5. Bump the `ref` in `templates/claude-settings.pinned.json` and in the examples
-   of this README.
+4. Bump the `ref` in `templates/claude-settings.pinned.json` and in the examples
+   of this README, commit.
+5. Tag that commit and push: `git tag -a vX.Y.Z -m "vX.Y.Z" && git push origin vX.Y.Z`.
 6. Announce the release (pinned projects update deliberately).
 
 ## Evals
@@ -160,7 +160,7 @@ the wrong ones) has to be measured, not assumed. `evals/` holds four kinds of ev
 | 1. Triggering | the right skills (and reference files) load for a request, incl. German prompts | automated |
 | 2. Negative tests | skills stay silent: no DLC in plain-DDD projects, nothing for non-domain tasks, `new-aggregate` never auto-invoked | automated |
 | 3. Activation via `AGENTS.md` | the skill-loading line and project overrides (event publishing, legacy contexts, validation style, mode) take effect | automated (except #37) |
-| 4. Rule adherence | generated code follows the team rules (events with IDs only, domain service for multi-aggregate transactions, read models, ports, `@BoundedContext`, ...) | automated |
+| 4. Rule adherence | generated code follows the team rules (events with IDs only, domain service for multi-aggregate transactions, read models, ports, `@BoundedContext`, glossary handling, ...) | automated |
 
 ### Automated suite
 Uses Claude Code's [`claude plugin eval`](https://code.claude.com/docs/en/plugin-evals).
@@ -206,8 +206,8 @@ evals/results/<timestamp>/report.html, aggregate-result.json
 
 Running:
 ```bash
-evals/run.sh --runs 1                         # all 85 cases once (~25-30 USD)
-evals/run.sh                                  # 3 runs per case (default, ~75-85 USD)
+evals/run.sh --runs 1                         # all 96 cases once (~30-35 USD)
+evals/run.sh                                  # 3 runs per case (default, ~85-100 USD)
 evals/run.sh --case 't1*' --runs 1            # subset by name: one --case, simple * globs only (no [0-9])
 evals/run.sh --tag rules                      # triggering | negative | agents-md | rules | mode-a/-b/-c/-none
 evals/run.sh --threshold 0.8 --max-cost-usd 20 --json results.json   # CI
@@ -256,6 +256,7 @@ duplicating it). It holds only project decisions, never library knowledge:
 | `Package layout` | default (from `ddd-tactical-java`) or a described deviation |
 | `Legacy contexts` | contexts where the skill rules are not binding |
 | `Code language` | language of domain terms, umlaut replacement in identifiers |
+| `Glossary` | path of the ubiquitous language glossary (default `docs/ubiquitous-language.md`) or `none`; with a glossary, new domain terms are added as candidates while implementing |
 | `Deviations from the skills` | conscious exceptions to skill rules |
 
 `dlc-project-setup` fills it in when setting up a project.

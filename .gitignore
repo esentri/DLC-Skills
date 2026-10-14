@@ -1,4 +1,4 @@
 evals/results/
 evals/.build/
-# generated from evals/triggering.json by evals/generate.py (run.sh regenerates)
+# generated from evals/suite.json by evals/generate.py (run.sh regenerates)
 evals/cases/

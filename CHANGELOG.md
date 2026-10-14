@@ -6,13 +6,25 @@ in the README). Each release states the DomainLifeCycles version it targets.
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-10-14
+
+Targets **DomainLifeCycles 3.5.x**.
+
 ### Added
 - `ubiquitous-language` (plugin `ddd-tactical-java`): glossary of domain terms in
   `docs/ubiquitous-language.md` - `build` from existing code (per bounded context,
   candidates, questions to the user instead of guesses), `check` code or changes
   against it. While implementing, new domain terms are added as `candidate`
   automatically (rule in `ddd-tactical-java`, only if the glossary exists).
-  `Glossary:` line in `templates/AGENTS.md.snippet`; `new-aggregate` uses the glossary.
+  `Glossary:` line in `templates/AGENTS.md.snippet` (asked for by `dlc-project-setup`);
+  `new-aggregate` uses the glossary.
+- Evals #93-#98 for the ubiquitous language (triggering, check, build with
+  questions, candidates while implementing, no glossary created without one).
+
+### Changed
+- README: release checklist bumps the pinned `ref` before tagging (the tag must
+  contain it); `npx skills` example for plain DDD installs both framework-agnostic
+  skills.
 
 ## [0.9.0] - 2026-10-13
 

@@ -27,6 +27,9 @@ Validation style: BeanValidation+DomainAssertions (validation extender)
 Always ask for the validation style too: validation extender -> Bean
 Validation + DomainAssertions (automatic); Bean Validation without extender ->
 `BeanValidations.validate(this)` in `validate()`; otherwise DomainAssertions only.
+Ask whether the team keeps a ubiquitous language glossary: yes -> `Glossary:
+docs/ubiquitous-language.md` (create it with the skill `ubiquitous-language`,
+mode `build`), no -> `Glossary: none`.
 
 ### Mode A - short path
 1. Record it in `AGENTS.md`, so later sessions know the absence of DLC is

@@ -7,7 +7,7 @@ tables here describe them and serve as a manual checklist for other agents
 check whether the expected skills load and the result follows the rule.
 
 Sample projects: **A** = plain Java, no DLC; **B** = DLC `types`/`type-utils`;
-**C** = Spring Boot 4 + DLC `spring-boot-starter` + jOOQ (unless stated otherwise). Unless the column
+**C** = Spring Boot 4 + DLC `spring-boot-starter` + jOOQ (unless stated otherwise); **C-JDBC** = like C with plain-JDBC persistence. Unless the column
 `AGENTS.md` says otherwise, the project's `AGENTS.md` contains the snippet from
 `templates/AGENTS.md.snippet` with the matching mode.
 
@@ -25,10 +25,10 @@ evals/run.sh --case 'r4*'             # subset by name: one --case, simple * glo
 
 | Section | Cases | Case names | Graders |
 |---|---|---|---|
-| 1. Triggering | #1-#31, #80-#83 | `t..` | expected skills loaded, forbidden not loaded, references read |
+| 1. Triggering | #1-#31, #80-#83, #93-#94 | `t..` | expected skills loaded, forbidden not loaded, references read |
 | 2. Negative tests | #32-#35 (+ `new-aggregate` forbidden everywhere = #36) | `n..` | forbidden skills not loaded |
 | 3. AGENTS.md activation | #38-#42 | `a..` | skills + regexes / LLM judge on the answer, with per-case `AGENTS.md` variants |
-| 4. Rule adherence | #43-#79, #84-#87 | `r..` | regexes on the answer (deterministic) + LLM judge (Haiku, 3 votes) for rules regexes can't express |
+| 4. Rule adherence | #43-#79, #84-#92, #95-#98 | `r..` | regexes on the answer (deterministic) + LLM judge (Haiku, 3 votes) for rules regexes can't express |
 
 - `evals/generate.py` turns the JSON into `evals/cases/<case>/case.yaml` + `setup.sh`
   (scaffolds the sample project; `agents` overrides lines of `AGENTS.md`, `legacy`
@@ -63,7 +63,7 @@ realistically in the sandbox - check it in a real project session.
 
 ## 4. Rule adherence (check the generated code)
 
-Automated as cases `r43`-`r79`, `r88`-`r92` and `r95`-`r98`. Mode `C-JDBC` = like C, but plain-JDBC persistence (no jOOQ).
+Automated as cases `r43`-`r79`, `r84`-`r92` and `r95`-`r98`.
 
 | # | Prompt | Mode | Check |
 |---|--------|------|-------|
