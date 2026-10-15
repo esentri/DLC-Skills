@@ -6,6 +6,11 @@ in the README). Each release states the DomainLifeCycles version it targets.
 
 ## [Unreleased]
 
+## [0.10.1] - 2026-10-15
+
+Targets **DomainLifeCycles 3.5.x** (validation extender activation in
+`@PostConstruct` needs 3.5.1+).
+
 ### Fixed
 - JDBC backend + Flyway/Liquibase with the Spring starter: the DLC autoconfig read
   the schema before the migrations ran (`Couldn't find table for '...'`).
