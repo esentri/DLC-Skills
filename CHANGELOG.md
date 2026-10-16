@@ -6,6 +6,18 @@ in the README). Each release states the DomainLifeCycles version it targets.
 
 ## [Unreleased]
 
+### Changed
+- `domainlifecycles` (`SKILL.md`, `references/domain-events.md`): event listener
+  methods carry `@DomainEventListener` only - no `@Transactional`, `@Async`,
+  `@EventListener`, `@TransactionalEventListener` or similar, unless `AGENTS.md`
+  says otherwise. New eval #100.
+- `ubiquitous-language`: `deprecated` terms get a `Replaced by` column (glossary
+  template, migrated when an existing glossary is written next). Only the user
+  deprecates; deprecated rows are kept; `check` suggests `Replaced by`; `build`
+  does not re-add deprecated terms as candidates but reports code still using
+  them. Template has a deprecated example row; eval glossaries migrated; new evals
+  #101 (check) and #102 (build).
+
 ## [0.10.1] - 2026-10-15
 
 Targets **DomainLifeCycles 3.5.x** (validation extender activation in

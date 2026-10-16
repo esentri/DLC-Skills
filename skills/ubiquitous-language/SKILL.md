@@ -21,8 +21,16 @@ a term means.
 - Status per term:
   - `candidate` - found or introduced, not yet agreed. Anyone (also the agent) may add.
   - `confirmed` - agreed with the team. **Only the user confirms**.
-  - `deprecated` - must no longer be used; `Avoid` / `Note` say what replaces it.
+  - `deprecated` - must no longer be used; `Replaced by` names the term to use
+    instead (or is empty if the concept was dropped). **Only the user deprecates** -
+    the agent may propose it (e.g. after a rename or when a synonym was rejected).
+- Deprecating a term: keep its row (status `deprecated`, `Replaced by` filled,
+  `Code` = identifiers that still use it); add the old word to `Avoid` of the
+  replacing term. Never delete a `deprecated` row - it documents why the old word
+  must not come back.
 - Never delete or rewrite a `confirmed` row on your own; propose the change instead.
+- An existing glossary without the `Replaced by` column: add the column (empty
+  cells) when you write to the file next time.
 
 ## Mode `build` - glossary from existing code
 
@@ -54,6 +62,9 @@ a term means.
    rows as `candidate`, update `Code` / `Open question` of existing rows, never
    overwrite definitions or status without asking. Apply the user's answers
    (`Avoid` gets the rejected synonyms). Report: terms added, questions still open.
+   A term found in code that is `deprecated` in the glossary is **not** added
+   again as `candidate`: list it in the report as code still using a deprecated
+   term (with `Replaced by`) and update the row's `Code` cell.
 
 Renaming code is **not** part of `build` - offer it as a separate step afterwards.
 
@@ -64,8 +75,9 @@ Renaming code is **not** part of `build` - offer it as a separate step afterward
    "PR". No glossary -> say so and offer `build`; don't check against guesses.
 2. **Check** every domain identifier in the target (types, methods, fields,
    enum constants, packages):
-   - uses a term from `Avoid` or a `deprecated` term -> finding with the
-     replacement,
+   - uses a term from `Avoid` -> finding, suggestion = the term of that row,
+   - uses a `deprecated` term -> finding, suggestion = its `Replaced by` (empty:
+     the concept was dropped - ask whether the code is still needed),
    - names a domain concept the glossary does not know -> new `candidate`
      (offer to add it),
    - uses a term of another context's section in this context -> finding (an
@@ -82,7 +94,8 @@ Renaming code is **not** part of `build` - offer it as a separate step afterward
 
 Applies whenever domain code is written and the glossary file exists (rule also
 in `ddd-tactical-java`):
-- Use `confirmed` terms; never a term from `Avoid` or a `deprecated` one.
+- Use `confirmed` terms; never a term from `Avoid` or a `deprecated` one (use its
+  `Replaced by` instead).
 - New domain concept you introduce (a type, an event, a command, a business
   method name not covered yet) -> append a `candidate` row with `Code` filled and
   `Definition` from the user's request or `?`. No questions, no confirmations.

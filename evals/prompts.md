@@ -28,7 +28,7 @@ evals/run.sh --case 'r4*'             # subset by name: one --case, simple * glo
 | 1. Triggering | #1-#31, #80-#83, #93-#94 | `t..` | expected skills loaded, forbidden not loaded, references read |
 | 2. Negative tests | #32-#35 (+ `new-aggregate` forbidden everywhere = #36) | `n..` | forbidden skills not loaded |
 | 3. AGENTS.md activation | #38-#42 | `a..` | skills + regexes / LLM judge on the answer, with per-case `AGENTS.md` variants |
-| 4. Rule adherence | #43-#79, #84-#92, #95-#99 | `r..` | regexes on the answer (deterministic) + LLM judge (Haiku, 3 votes) for rules regexes can't express |
+| 4. Rule adherence | #43-#79, #84-#92, #95-#102 | `r..` | regexes on the answer (deterministic) + LLM judge (Haiku, 3 votes) for rules regexes can't express |
 
 - `evals/generate.py` turns the JSON into `evals/cases/<case>/case.yaml` + `setup.sh`
   (scaffolds the sample project; `agents` overrides lines of `AGENTS.md`, `legacy`
@@ -63,7 +63,7 @@ realistically in the sandbox - check it in a real project session.
 
 ## 4. Rule adherence (check the generated code)
 
-Automated as cases `r43`-`r79`, `r84`-`r92` and `r95`-`r99`.
+Automated as cases `r43`-`r79`, `r84`-`r92` and `r95`-`r102`.
 
 | # | Prompt | Mode | Check |
 |---|--------|------|-------|
@@ -107,6 +107,7 @@ Automated as cases `r43`-`r79`, `r84`-`r92` and `r95`-`r99`.
 | 91 | Read-only method hasStatus(OrderStatus) on Order | C + extender | import from `io.domainlifecycles.validation.extend`, not `core.validation` |
 | 92 | Add SpringDoc for the REST API | C | `springdoc.use-fqn=true` |
 | 99 | Startup fails with "Couldn't find table" although Flyway created it | C-JDBC | `DependsOnDatabaseInitializationDetector` for `JdbcSchemaMetadata`, registered in `spring.factories` |
+| 100 | Notify the customer by e-mail when an order is shipped | C | listener method has `@DomainEventListener` only - no `@Transactional`, `@Async`, `@EventListener`, `@TransactionalEventListener` |
 | 69 | Orders created via REST without id | C | `EntityIdentityProvider` |
 | 70 | GET endpoint for an order by id | C | `@PathVariable` typed `OrderId`, not `Long` |
 | 71 | Integration test for the Order repository | C | `@SpringBootTest`, no `Domain.initialize` |
@@ -134,6 +135,8 @@ Automated as cases `r43`-`r79`, `r84`-`r92` and `r95`-`r99`.
 | 96 | Build the glossary from the domain code (`Customer` and `ClientDataHandler`) | B | rows as `candidate`, asks about Customer vs. Client, flags technical name, no invented definitions (judge) |
 | 97 | Put an order on hold (glossary exists) | C | new term added as `candidate` to `docs/ubiquitous-language.md`, listed at the end (judge) |
 | 98 | Same as 97 without glossary | C | no glossary file created (judge) |
+| 101 | Check the order domain code against our UL (glossary: `Place order` deprecated, replaced by `Submit order`) | C | flags `PlaceOrder`, suggests `Submit order` from `Replaced by`, no automatic rename (judge) |
+| 102 | Update the glossary from the domain code (same glossary as 101) | C | deprecated row kept, `PlaceOrder` not re-added as candidate, reported with its replacement (judge) |
 
 ### Diagram Viewer
 

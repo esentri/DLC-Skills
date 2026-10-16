@@ -45,6 +45,11 @@ public void onOrderShipped(OrderShipped event) { ... }
   and query handlers.
 - Service listener methods have exactly one parameter, the event; the service
   must be registered with DLC (Spring: autoconfig picks up the beans).
+- `@DomainEventListener` is the **only** annotation on a listener method: no
+  `@Transactional`, `@Async`, `@EventListener`, `@TransactionalEventListener`,
+  `@Order` or similar - transaction boundaries and asynchrony come from the
+  DomainEvents setup (see below), not from the listener. Exception: `AGENTS.md`
+  defines something else (e.g. under `Deviations from the skills`).
 - **Aggregate roots as listeners** require the event to implement
   `AggregateDomainEvent<ID, A>` with `targetId()`. DLC loads the aggregate via its
   repository, calls the listener and updates it in a separate transaction - this

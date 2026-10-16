@@ -206,7 +206,7 @@ evals/results/<timestamp>/report.html, aggregate-result.json
 
 Running:
 ```bash
-evals/run.sh --runs 1                         # all 97 cases once (~30-35 USD)
+evals/run.sh --runs 1                         # all 100 cases once (~30-35 USD)
 evals/run.sh                                  # 3 runs per case (default, ~85-100 USD)
 evals/run.sh --case 't1*' --runs 1            # subset by name: one --case, simple * globs only (no [0-9])
 evals/run.sh --tag rules                      # triggering | negative | agents-md | rules | mode-a/-b/-c/-none

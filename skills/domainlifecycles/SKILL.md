@@ -107,6 +107,10 @@ Base classes live in `io.domainlifecycles.domain.types.base` (module `type-utils
   Details: `references/validation.md`.
 - References to other aggregates are typed `Identity` fields, never object references
   (the Mirror and persistence rely on this).
+- Event listener methods carry `@DomainEventListener` and **nothing else** - no
+  `@Transactional`, `@Async`, `@EventListener`, `@TransactionalEventListener` or
+  other transaction/threading annotations: DLC's event setup controls transaction
+  and dispatch. Only if `AGENTS.md` says otherwise.
 
 ## Module references - load only what the project uses
 

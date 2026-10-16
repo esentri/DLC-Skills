@@ -13,7 +13,8 @@ Library-specific skills build on top of these rules and never replace them.
 1. **Clarify the language.** Name the concepts with the domain expert's terms. If a
    term is ambiguous, ask instead of inventing one. If the project has a glossary
    (`Glossary:` in `AGENTS.md`, default `docs/ubiquitous-language.md`):
-   - use its `confirmed` terms; never a term listed under `Avoid` or `deprecated`,
+   - use its `confirmed` terms; never a term listed under `Avoid` or `deprecated`
+     (a `deprecated` row names the term to use in `Replaced by`),
    - every new domain concept you introduce (type, event, command, business
      method) -> append it as a `candidate` row (format and rules: skill
      `ubiquitous-language`); no questions, never mark anything `confirmed`,
