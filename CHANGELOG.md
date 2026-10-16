@@ -6,6 +6,10 @@ in the README). Each release states the DomainLifeCycles version it targets.
 
 ## [Unreleased]
 
+## [0.10.2] - 2026-10-16
+
+Targets **DomainLifeCycles 3.5.x**.
+
 ### Changed
 - `domainlifecycles` (`SKILL.md`, `references/domain-events.md`): event listener
   methods carry `@DomainEventListener` only - no `@Transactional`, `@Async`,
