@@ -73,7 +73,12 @@ Base classes live in `io.domainlifecycles.domain.types.base` (module `type-utils
   always Java **records** implementing the marker interface.
 - Every `ApplicationService` method that processes a command takes exactly one
   `DomainCommand` record as its parameter.
-- Read models are served by a `QueryHandler<R>`, never by a `Repository`.
+- CQRS light: if one aggregate satisfies the read need, return the aggregate
+  from its `Repository` - no `ReadModel`. A `ReadModel` + `QueryHandler<R>` only
+  for data spanning several aggregates, a part of an aggregate, or derived
+  values (sums, counts). Stricter if `AGENTS.md` says so ("never expose
+  aggregates": every read via `ReadModel`). Read models are served by a
+  `QueryHandler<R>`, never by a `Repository`.
 - Outbound ports: the port **interface** extends `OutboundService` (domain or
   application layer), the adapter implements it in infrastructure. Callers depend
   on the interface only.

@@ -169,8 +169,10 @@ For a guided checklist see `references/modeling-checklist.md`.
 - Own the transaction - one use case is atomic.
 - Bridge to infrastructure: trigger confirmation e-mails, external APIs and
   event publishing via outbound ports.
-- Input: domain commands (or simple DTOs mapped to commands). Output: read models
-  or a simple confirmation - never expose mutable aggregates to the outside.
+- Input: domain commands (or simple DTOs mapped to commands). Output: the
+  aggregate (see CQRS light under "Read models and query handlers"), a read model
+  or a simple confirmation. Callers outside the use case never modify a returned
+  aggregate - changes always go through a command.
 - Authentication and authorization ("may this user execute this command?") are
   checked here or in interceptors in front of it.
 
@@ -215,6 +217,16 @@ For a guided checklist see `references/modeling-checklist.md`.
   service) and passed into the core unchanged.
 
 ### Read models and query handlers
+- **Default is CQRS light:** if a single aggregate satisfies the read need,
+  return the aggregate (loaded via its repository) - no read model, no query
+  handler.
+- Introduce a read model + query handler **only** if the aggregate cannot
+  structurally provide the information: data spanning several aggregates, only
+  a part of an aggregate, or derived/aggregated values (sums, counts, ...).
+  "The UI wants a different shape" alone is no reason - map in the adapter.
+- `AGENTS.md` may demand a stricter rule ("never expose aggregates"): then
+  aggregates never leave the application service, and every read goes through
+  a read model + query handler.
 - Read models are immutable, shaped purely for their consumer (UI, API client);
   flat or nested, whatever simplifies the client.
 - May combine data from several aggregates (denormalised) - unlike aggregates.

@@ -96,7 +96,7 @@ public interface OrderRepository extends Repository<Order.OrderId, Order> {
 | `ApplicationService` | Use-case orchestration, transaction boundary          |
 | `Factory`            | Dedicated creation class, see "Factories" below       |
 | `DomainCommand`      | Immutable command record entering the domain          |
-| `ReadModel` + `QueryHandler<R>` | Query side, decoupled from aggregates      |
+| `ReadModel` + `QueryHandler<R>` | Query side, only if no single aggregate fits (CQRS light) |
 | `OutboundService`    | Outbound port to external systems, see below          |
 
 ## Outbound services

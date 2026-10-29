@@ -78,7 +78,7 @@ Plain-DDD projects without DLC only enable `ddd-tactical-java@dlc-plugins`.
 **Manually / fallback** (if the project settings are not picked up):
 ```bash
 claude plugin marketplace add esentri/DLC-Skills          # latest
-claude plugin marketplace add esentri/DLC-Skills#v0.10.2   # pinned release
+claude plugin marketplace add esentri/DLC-Skills#v0.10.3   # pinned release
 claude plugin install ddd-tactical-java@dlc-plugins
 claude plugin install domainlifecycles@dlc-plugins
 ```

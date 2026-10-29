@@ -6,6 +6,21 @@ in the README). Each release states the DomainLifeCycles version it targets.
 
 ## [Unreleased]
 
+## [0.10.3] - 2026-10-28
+
+Targets **DomainLifeCycles 3.5.x**.
+
+### Changed
+- `ddd-tactical-java` (application services, read models), `domainlifecycles`
+  (`SKILL.md`, `references/marker-types.md`): CQRS light is the default - if a
+  single aggregate satisfies the read need, the aggregate is returned, no read
+  model. A read model + query handler only when the aggregate cannot
+  structurally provide the data (several aggregates, part of an aggregate,
+  derived/aggregated values). Application service output: the aggregate, a read
+  model or a simple confirmation. `AGENTS.md` may demand the stricter rule
+  "never expose aggregates" (every read via read model). New evals #103
+  (CQRS light) and #104 (`AGENTS.md` override).
+
 ## [0.10.2] - 2026-10-16
 
 Targets **DomainLifeCycles 3.5.x**.

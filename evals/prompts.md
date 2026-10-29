@@ -28,7 +28,7 @@ evals/run.sh --case 'r4*'             # subset by name: one --case, simple * glo
 | 1. Triggering | #1-#31, #80-#83, #93-#94 | `t..` | expected skills loaded, forbidden not loaded, references read |
 | 2. Negative tests | #32-#35 (+ `new-aggregate` forbidden everywhere = #36) | `n..` | forbidden skills not loaded |
 | 3. AGENTS.md activation | #38-#42 | `a..` | skills + regexes / LLM judge on the answer, with per-case `AGENTS.md` variants |
-| 4. Rule adherence | #43-#79, #84-#92, #95-#102 | `r..` | regexes on the answer (deterministic) + LLM judge (Haiku, 3 votes) for rules regexes can't express |
+| 4. Rule adherence | #43-#79, #84-#92, #95-#104 | `r..` | regexes on the answer (deterministic) + LLM judge (Haiku, 3 votes) for rules regexes can't express |
 
 - `evals/generate.py` turns the JSON into `evals/cases/<case>/case.yaml` + `setup.sh`
   (scaffolds the sample project; `agents` overrides lines of `AGENTS.md`, `legacy`
@@ -126,6 +126,8 @@ Automated as cases `r43`-`r79`, `r84`-`r92` and `r95`-`r102`.
 | 79 | Flow diagram from PlaceOrder incl. repository implementations | C | `includeFlowsFrom` + `staticAnalysisPackages` |
 | 89 | Lege den Befehl an, mit dem ein Gast eincheckt | A | command named in the imperative (`CheckeEin`), not `Einchecken` (judge) |
 | 90 | Invoice aggregate with states DRAFT/ISSUED/PAID/CANCELLED | C | no domain events without a listener (judge) |
+| 103 | Return a single order with its items by id for the detail view | C | CQRS light: aggregate from the repository returned, no `ReadModel` / `QueryHandler` (judge) |
+| 104 | Same as 103, `AGENTS.md`: never expose aggregates | C | `ReadModel` + `QueryHandler`, aggregate not returned (judge) |
 
 ### Ubiquitous language
 
